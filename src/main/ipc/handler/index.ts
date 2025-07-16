@@ -1,8 +1,7 @@
-import { ipcMain, IpcMainEvent } from 'electron'
+import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import forge from 'node-forge'
-
 // IPC test
-ipcMain.on('create-cert', (_event: IpcMainEvent, ...args: unknown[]) => {
+ipcMain.handle('create-cert', (_event: IpcMainInvokeEvent, ...args: unknown[]) => {
   console.log(args)
 
   // 生成密钥对
