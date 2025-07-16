@@ -20,118 +20,101 @@ ipcMain.handle(
       keySize?: number
     }
   ) => {
-    try {
-      console.log('创建证书:', certInfo)
+    // 设置默认值
+    const {
+      commonName,
+      country = 'CN',
+      state = 'Beijing',
+      locality = 'Beijing',
+      organization = 'My Company',
+      organizationUnit = 'Dev',
+      altNames = ['localhost'],
+      validityDays = 365,
+      keySize = 2048
+    } = certInfo
 
-      // 设置默认值
-      const {
-        commonName,
-        country = 'CN',
-        state = 'Beijing',
-        locality = 'Beijing',
-        organization = 'My Company',
-        organizationUnit = 'Dev',
-        altNames = ['localhost'],
-        validityDays = 365,
-        keySize = 2048
-      } = certInfo
+    // 生成密钥对
+    const keys = forge.pki.rsa.generateKeyPair(keySize)
 
-      // 生成密钥对
-      const keys = forge.pki.rsa.generateKeyPair(keySize)
+    // 创建证书
+    const cert = forge.pki.createCertificate()
+    cert.publicKey = keys.publicKey
+    cert.serialNumber = Date.now().toString(16) // 使用时间戳作为序列号
+    cert.validity.notBefore = new Date()
+    cert.validity.notAfter = new Date()
+    cert.validity.notAfter.setDate(cert.validity.notBefore.getDate() + validityDays)
 
-      // 创建证书
-      const cert = forge.pki.createCertificate()
-      cert.publicKey = keys.publicKey
-      cert.serialNumber = Date.now().toString(16) // 使用时间戳作为序列号
-      cert.validity.notBefore = new Date()
-      cert.validity.notAfter = new Date()
-      cert.validity.notAfter.setDate(cert.validity.notBefore.getDate() + validityDays)
+    // 设置证书主题（Subject）
+    const attrs = [
+      { name: 'commonName', value: commonName },
+      { name: 'countryName', value: country },
+      { shortName: 'ST', value: state },
+      { name: 'localityName', value: locality },
+      { name: 'organizationName', value: organization },
+      { shortName: 'OU', value: organizationUnit }
+    ]
+    cert.setSubject(attrs)
+    cert.setIssuer(attrs) // 自签名证书的颁发者是自身
 
-      // 设置证书主题（Subject）
-      const attrs = [
-        { name: 'commonName', value: commonName },
-        { name: 'countryName', value: country },
-        { shortName: 'ST', value: state },
-        { name: 'localityName', value: locality },
-        { name: 'organizationName', value: organization },
-        { shortName: 'OU', value: organizationUnit }
-      ]
-      cert.setSubject(attrs)
-      cert.setIssuer(attrs) // 自签名证书的颁发者是自身
+    // 添加扩展（如 Subject Alternative Name）
+    const altNameObjects = altNames.map((name) => ({ type: 2, value: name }))
 
-      // 添加扩展（如 Subject Alternative Name）
-      const altNameObjects = altNames.map((name) => ({ type: 2, value: name }))
-
-      cert.setExtensions([
-        {
-          name: 'basicConstraints',
-          cA: true
-        },
-        {
-          name: 'keyUsage',
-          keyCertSign: true,
-          digitalSignature: true,
-          nonRepudiation: true,
-          keyEncipherment: true,
-          dataEncipherment: true
-        },
-        {
-          name: 'subjectAltName',
-          altNames: altNameObjects
-        }
-      ])
-
-      // 自签名
-      cert.sign(keys.privateKey, forge.md.sha256.create())
-
-      // 导出 PEM 格式
-      const pem = {
-        privateKey: forge.pki.privateKeyToPem(keys.privateKey),
-        publicKey: forge.pki.publicKeyToPem(keys.publicKey),
-        certificate: forge.pki.certificateToPem(cert)
+    cert.setExtensions([
+      {
+        name: 'basicConstraints',
+        cA: true
+      },
+      {
+        name: 'keyUsage',
+        keyCertSign: true,
+        digitalSignature: true,
+        nonRepudiation: true,
+        keyEncipherment: true,
+        dataEncipherment: true
+      },
+      {
+        name: 'subjectAltName',
+        altNames: altNameObjects
       }
+    ])
 
-      // 创建证书对象
-      const certObject = {
-        id: Date.now().toString(),
-        name: commonName,
-        subject: {
-          commonName,
-          country,
-          state,
-          locality,
-          organization,
-          organizationUnit
-        },
-        altNames,
-        validFrom: cert.validity.notBefore.toISOString(),
-        validTo: cert.validity.notAfter.toISOString(),
-        serialNumber: cert.serialNumber,
-        pem
-      }
+    // 自签名
+    cert.sign(keys.privateKey, forge.md.sha256.create())
 
-      // // 获取应用数据目录
-      // const appDataPath = path.join(app.getPath('userData'), 'certificates')
-      // const filePath = path.join(appDataPath, fileName)
-      // console.log(appDataPath);
-
-      // // 保存证书到文件
-      // const saveResult = await writeFile(filePath, JSON.stringify(certObject, null, 2), { force })
-
-      return {
-        success: true,
-        message: '证书创建成功',
-        data: {
-          certObject
-        }
-      }
-    } catch (error) {
-      console.error('创建证书失败:', error)
-      return {
-        success: false,
-        message: `创建证书失败: ${(error as Error).message}`
-      }
+    // 导出 PEM 格式
+    const pem = {
+      privateKey: forge.pki.privateKeyToPem(keys.privateKey),
+      publicKey: forge.pki.publicKeyToPem(keys.publicKey),
+      certificate: forge.pki.certificateToPem(cert)
     }
+
+    // 创建证书对象
+    const certObject = {
+      id: Date.now().toString(),
+      subject: {
+        commonName,
+        country,
+        state,
+        locality,
+        organization,
+        organizationUnit,
+        altNames,
+        serialNumber: cert.serialNumber
+      },
+      validFrom: cert.validity.notBefore.toISOString(),
+      validTo: cert.validity.notAfter.toISOString(),
+      pem
+    }
+
+    // // 获取应用数据目录
+    // const appDataPath = path.join(app.getPath('userData'), 'certificates')
+    // const filePath = path.join(appDataPath, fileName)
+    // console.log(appDataPath);
+
+    // // 保存证书到文件
+    // const saveResult = await writeFile(filePath, JSON.stringify(certObject, null, 2), { force })
+
+    return certObject
   }
 )
 

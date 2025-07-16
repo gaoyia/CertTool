@@ -81,12 +81,14 @@ import { ref, nextTick } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
 import {
   createCertificate,
-  type Certificate,
+  type CreateCertResult,
   type CertificateInfo
 } from '@renderer/api/certificate'
 import { deepToRaw } from '@renderer/utils/index'
+import { openDirectoryDialog } from '@renderer/api/dialog'
+import { saveFile } from '@renderer/api/file'
 // 证书列表
-const certificates = ref<Certificate[]>([])
+const certificate = ref<CreateCertResult>()
 
 // 创建证书表单
 const certFormRef = ref<FormInstance>()
@@ -123,6 +125,33 @@ const showCreateDialog = () => {
   createDialogVisible.value = true
 }
 
+/**
+ * 保存证书文件到用户选择的目录
+ * @param certResult 证书创建结果
+ */
+const saveCertificates = async (certResult: CreateCertResult, dirName: string) => {
+  // 打开目录选择对话框
+  const dirPath = await openDirectoryDialog()
+
+  if (dirPath) {
+    try {
+      // 保存证书文件
+      await saveFile(`${dirPath}/${dirName}/certificate.pem`, certResult.pem.certificate, {
+        force: true
+      })
+      await saveFile(`${dirPath}/${dirName}/private.key`, certResult.pem.privateKey, {
+        force: true
+      })
+      await saveFile(`${dirPath}/${dirName}/public.key`, certResult.pem.publicKey, { force: true })
+
+      ElMessage.success(`证书已保存到 ${dirPath}`)
+    } catch (error) {
+      console.error('保存证书文件时出错:', error)
+      ElMessage.error('保存证书文件失败')
+    }
+  }
+}
+
 // 创建证书
 const createCert = async () => {
   if (!certFormRef.value) return
@@ -131,21 +160,21 @@ const createCert = async () => {
     if (valid) {
       try {
         creating.value = true
+        const form = deepToRaw(certForm.value)
+        console.log(form)
 
-        // 生成文件名
-        // const fileName = `${certForm.value.commonName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.cert`
-        const result = await createCertificate(deepToRaw(certForm.value))
+        // 生成文件夹名
+        const dirName = `${certForm.value.commonName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}_cert`
+        const result = await createCertificate(form)
 
-        if (result.success && result.data) {
+        if (result) {
           ElMessage.success('证书创建成功')
-          certificates.value.push(result.data.certObject)
+          certificate.value = result
           createDialogVisible.value = false
-          console.log(result);
+          console.log(result)
 
-          // TODO: 弹窗获取路径
-
-          // TODO: 保存证书到本地
-
+          // 保存证书到本地
+          await saveCertificates(result, dirName)
 
           // 重置表单
           certForm.value = {
@@ -160,7 +189,7 @@ const createCert = async () => {
             keySize: 2048
           }
         } else {
-          ElMessage.error(result.message || '证书创建失败')
+          ElMessage.error('证书创建失败')
         }
       } catch (error) {
         console.error('创建证书时出错:', error)

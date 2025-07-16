@@ -1,24 +1,16 @@
 /**
- * 文件操作结果接口
- */
-export interface FileResult<T = void> {
-  success: boolean
-  message: string
-  data?: T
-}
-/**
  * 保存文件到应用数据目录
- * @param fileName 文件名
+ * @param filePath 文件名
  * @param content 文件内容
  * @param options 选项
  * @returns 保存结果
  */
 export const saveFile = async (
-  fileName: string,
+  filePath: string,
   content: string,
   options?: { force?: boolean }
-): Promise<FileResult> => {
-  return await window.electron.ipcRenderer.invoke('save-file', fileName, content, options)
+): Promise<void> => {
+  return await window.electron.ipcRenderer.invoke('save-file', filePath, content, options)
 }
 
 /**
@@ -26,7 +18,7 @@ export const saveFile = async (
  * @param fileName 文件名
  * @returns 读取结果
  */
-export const readFile = async (fileName: string): Promise<FileResult<string>> => {
+export const readFile = async (fileName: string): Promise<Buffer<ArrayBufferLike>> => {
   return await window.electron.ipcRenderer.invoke('read-file', fileName)
 }
 
@@ -44,7 +36,7 @@ export const fileExists = async (fileName: string): Promise<boolean> => {
  * @param fileName 文件名
  * @returns 删除结果
  */
-export const deleteFile = async (fileName: string): Promise<FileResult> => {
+export const deleteFile = async (fileName: string): Promise<void> => {
   return await window.electron.ipcRenderer.invoke('delete-file', fileName)
 }
 

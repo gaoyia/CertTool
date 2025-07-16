@@ -1,21 +1,29 @@
 import { ElMessage } from 'element-plus'
-import { reactive, toRaw, isReactive, isRef, ref, shallowReactive } from 'vue'
+import { toRaw, isReactive, isRef, isProxy } from 'vue'
 
 export function deepToRaw(obj) {
-  if (isRef(obj)) {
-    obj = obj.value // 如果是 ref，取其 value
+  // 处理原始值
+  if (typeof obj !== 'object' || obj === null) {
+    return obj
   }
-  if (isReactive(obj) || shallowReactive(obj)) {
-    // 处理 reactive 和 shallowReactive
+  // 处理 ref
+  if (isRef(obj)) {
+    obj = obj.value
+  }
+  // 处理响应式对象
+  if (isReactive(obj) || isProxy(obj)) {
+    // isProxy 可以检测更多代理类型
     obj = toRaw(obj)
   }
-  if (typeof obj === 'object' && obj !== null) {
+  // 只处理普通对象和数组
+  if (Object.prototype.toString.call(obj) === '[object Object]' || Array.isArray(obj)) {
     for (const key in obj) {
       if (Object.hasOwnProperty.call(obj, key)) {
         obj[key] = deepToRaw(obj[key])
       }
     }
   }
+
   return obj
 }
 

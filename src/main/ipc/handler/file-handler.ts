@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
-import { writeFile, readFile, deleteFile, fileExists, FileResult } from '../../utility/file'
+import { writeFile, readFile, deleteFile, fileExists } from '../../utility/file'
 import path from 'path'
 import { app } from 'electron'
 
@@ -13,23 +13,11 @@ ipcMain.handle(
   'save-file',
   async (
     _event: IpcMainInvokeEvent,
-    fileName: string,
+    filePath: string,
     content: string,
-    options?: { force?: boolean }
-  ): Promise<FileResult> => {
-    try {
-      const filePath = path.join(getAppDataPath(), fileName)
-      const result = await writeFile(filePath, content, {
-        force: options?.force || false,
-        encoding: 'utf-8'
-      })
-      return result
-    } catch (error) {
-      return {
-        success: false,
-        message: `保存文件时发生错误: ${(error as Error).message}`
-      }
-    }
+    options?: object
+  ): Promise<void> => {
+    return writeFile(filePath, content, options)
   }
 )
 
@@ -38,28 +26,17 @@ ipcMain.handle(
   'read-file',
   async (
     _event: IpcMainInvokeEvent,
-    fileName: string
-  ): Promise<FileResult<string | Buffer<ArrayBufferLike>>> => {
-    try {
-      const filePath = path.join(getAppDataPath(), fileName)
-      const result = await readFile(filePath, { encoding: 'utf-8' })
-      return result
-    } catch (error) {
-      return {
-        success: false,
-        message: `读取文件时发生错误: ${(error as Error).message}`,
-        data: ''
-      }
-    }
+    filePath: string
+  ): Promise<string | Buffer<ArrayBufferLike>> => {
+    return await readFile(filePath, { encoding: 'utf-8' })
   }
 )
 
 // 检查文件是否存在
 ipcMain.handle(
   'file-exists',
-  async (_event: IpcMainInvokeEvent, fileName: string): Promise<boolean> => {
+  async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
     try {
-      const filePath = path.join(getAppDataPath(), fileName)
       return await fileExists(filePath)
     } catch (error) {
       console.error(`检查文件是否存在时发生错误: ${(error as Error).message}`)
@@ -71,16 +48,8 @@ ipcMain.handle(
 // 删除文件
 ipcMain.handle(
   'delete-file',
-  async (_event: IpcMainInvokeEvent, fileName: string): Promise<FileResult> => {
-    try {
-      const filePath = path.join(getAppDataPath(), fileName)
-      return await deleteFile(filePath)
-    } catch (error) {
-      return {
-        success: false,
-        message: `删除文件时发生错误: ${(error as Error).message}`
-      }
-    }
+  async (_event: IpcMainInvokeEvent, filePath: string): Promise<void> => {
+    await deleteFile(filePath)
   }
 )
 

@@ -29,13 +29,15 @@ export interface Certificate {
  * 创建证书结果接口
  */
 export interface CreateCertResult {
-  success: boolean
-  message: string
-  data?: {
-    certObject: Certificate
-    fileName: string
-    saved: boolean
+  id: string
+  subject: CertificateInfo
+  pem: {
+    certificate: string
+    privateKey: string
+    publicKey: string
   }
+  validFrom: string
+  validTo: string
 }
 
 /**
