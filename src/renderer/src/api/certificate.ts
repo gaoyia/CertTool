@@ -19,25 +19,12 @@ export interface CertificateInfo {
  * 证书数据接口
  */
 export interface Certificate {
-  id: string
-  name: string
-  subject: {
-    commonName: string
-    country: string
-    state: string
-    locality: string
-    organization: string
-    organizationUnit: string
-  }
-  altNames: string[]
-  validFrom: string
-  validTo: string
+  subject: string
+  issuer: string
+  thumbprint: string
+  notAfter: string
+  notBefore: string
   serialNumber: string
-  pem: {
-    privateKey: string
-    publicKey: string
-    certificate: string
-  }
 }
 
 /**
@@ -62,7 +49,8 @@ export const createCertificate = async (certInfo: CertificateInfo): Promise<Crea
   return await window.electron.ipcRenderer.invoke('create-cert', certInfo)
 }
 
-
-export const getTrustedRootCertificates = async (): Promise<Certificate[]> => {
-  return await window.electron.ipcRenderer.invoke('Get-TrustedRootCertificates', 'LocalMachine')
+export const getTrustedRootCertificates = async (
+  location: 'LocalMachine' | 'CurrentUser' = 'LocalMachine'
+): Promise<Certificate[]> => {
+  return await window.electron.ipcRenderer.invoke('Get-TrustedRootCertificates', location)
 }

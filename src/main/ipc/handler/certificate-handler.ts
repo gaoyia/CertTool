@@ -142,44 +142,55 @@ ipcMain.handle(
   }
 )
 
-// 证书创建处理程序
+// 获取受信任的根证书处理程序
 ipcMain.handle(
   'Get-TrustedRootCertificates',
   async (_event: IpcMainInvokeEvent, storeLocation: 'LocalMachine' | 'CurrentUser') => {
-    exec(
-      `powershell.exe -ExecutionPolicy Bypass -File "${GetTrustedRootCertificates}" -StoreLocation ${storeLocation}`,
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error(`执行错误: ${error}`)
-          return
-        }
-        if (stderr) {
-          console.error(`PowerShell 错误: ${stderr}`)
-          return
-        }
-        // 使用两个换行符分割
-        const certificates = stdout.split('----------')
-        certificates.pop() // 移除最后一个空元素
-        const header = ['Subject', 'Issuer', 'Thumbprint', 'NotAfter', 'NotBefore', 'SerialNumber']
-        const data = certificates.map((certificate) => {
-          const lines = certificate.split(/\r?\n/).filter((item) => item !== '')
-          const subject = lines[0]
-          const issuer = lines[1]
-          const thumbprint = lines[2]
-          const notAfter = lines[3]
-          const notBefore = lines[4]
-          const serialNumber = lines[5]
-          return {
-            subject,
-            issuer,
-            thumbprint,
-            notAfter,
-            notBefore,
-            serialNumber
+    return new Promise((resolve, reject) => {
+      exec(
+        `powershell.exe -ExecutionPolicy Bypass -File "${GetTrustedRootCertificates}" -StoreLocation ${storeLocation}`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`执行错误: ${error}`)
+            reject(new Error(`执行错误: ${error.message}`))
+            return
           }
-        })
-        return data
-      }
-    )
+          if (stderr) {
+            console.error(`PowerShell 错误: ${stderr}`)
+            // 有些PowerShell命令会输出到stderr但仍然成功执行，所以这里只记录不拒绝
+          }
+
+          try {
+            // 使用分隔符分割
+            const certificates = stdout.split('----------')
+            certificates.pop() // 移除最后一个空元素
+
+            const data = certificates.map((certificate) => {
+              const lines = certificate.split(/\r?\n/).filter((item) => item !== '')
+              const subject = lines[0]
+              const issuer = lines[1]
+              const thumbprint = lines[2]
+              const notAfter = lines[3]
+              const notBefore = lines[4]
+              const serialNumber = lines[5]
+              return {
+                subject,
+                issuer,
+                thumbprint,
+                notAfter,
+                notBefore,
+                serialNumber
+              }
+            })
+
+            console.log(`获取到 ${data.length} 个证书`)
+            resolve(data)
+          } catch (parseError) {
+            console.error('解析证书数据失败:', parseError)
+            reject(new Error(`解析证书数据失败: ${(parseError as Error).message}`))
+          }
+        }
+      )
+    })
   }
 )
