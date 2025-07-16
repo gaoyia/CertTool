@@ -11,8 +11,6 @@ export interface CertificateInfo {
   altNames?: string[]
   validityDays?: number
   keySize?: number
-  fileName?: string
-  force?: boolean
 }
 
 /**

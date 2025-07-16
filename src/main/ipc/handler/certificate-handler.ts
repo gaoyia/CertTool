@@ -1,7 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent, app } from 'electron'
 import forge from 'node-forge'
-import path from 'path'
-import { writeFile } from '../../utility/file'
 import { exec } from 'child_process'
 import GetTrustedRootCertificates from '../../../../resources/Get-TrustedRootCertificates.ps1?asset&asarUnpack'
 
@@ -20,8 +18,6 @@ ipcMain.handle(
       altNames?: string[]
       validityDays?: number
       keySize?: number
-      fileName?: string
-      force?: boolean
     }
   ) => {
     try {
@@ -37,9 +33,7 @@ ipcMain.handle(
         organizationUnit = 'Dev',
         altNames = ['localhost'],
         validityDays = 365,
-        keySize = 2048,
-        fileName = `${commonName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.cert`,
-        force = false
+        keySize = 2048
       } = certInfo
 
       // 生成密钥对
@@ -116,20 +110,19 @@ ipcMain.handle(
         pem
       }
 
-      // 获取应用数据目录
-      const appDataPath = path.join(app.getPath('userData'), 'certificates')
-      const filePath = path.join(appDataPath, fileName)
+      // // 获取应用数据目录
+      // const appDataPath = path.join(app.getPath('userData'), 'certificates')
+      // const filePath = path.join(appDataPath, fileName)
+      // console.log(appDataPath);
 
-      // 保存证书到文件
-      const saveResult = await writeFile(filePath, JSON.stringify(certObject, null, 2), { force })
+      // // 保存证书到文件
+      // const saveResult = await writeFile(filePath, JSON.stringify(certObject, null, 2), { force })
 
       return {
         success: true,
         message: '证书创建成功',
         data: {
-          certObject,
-          fileName,
-          saved: saveResult
+          certObject
         }
       }
     } catch (error) {

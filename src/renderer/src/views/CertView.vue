@@ -133,21 +133,19 @@ const createCert = async () => {
         creating.value = true
 
         // 生成文件名
-        const fileName = `${certForm.value.commonName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.cert`
-
-        // 创建证书
-        const obj = {
-          ...certForm.value,
-          fileName
-        }
-        console.log(obj)
-
-        const result = await createCertificate(deepToRaw(obj))
+        // const fileName = `${certForm.value.commonName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.cert`
+        const result = await createCertificate(deepToRaw(certForm.value))
 
         if (result.success && result.data) {
           ElMessage.success('证书创建成功')
           certificates.value.push(result.data.certObject)
           createDialogVisible.value = false
+          console.log(result);
+
+          // TODO: 弹窗获取路径
+
+          // TODO: 保存证书到本地
+
 
           // 重置表单
           certForm.value = {
