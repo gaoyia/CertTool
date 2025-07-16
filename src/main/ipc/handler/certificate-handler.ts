@@ -2,6 +2,7 @@ import { ipcMain, IpcMainInvokeEvent, app } from 'electron'
 import forge from 'node-forge'
 import { exec } from 'child_process'
 import GetTrustedRootCertificates from '../../../../resources/Get-TrustedRootCertificates.ps1?asset&asarUnpack'
+import { writeFile } from '../../utility/file'
 
 // 证书创建处理程序
 ipcMain.handle(
@@ -106,14 +107,6 @@ ipcMain.handle(
       pem
     }
 
-    // // 获取应用数据目录
-    // const appDataPath = path.join(app.getPath('userData'), 'certificates')
-    // const filePath = path.join(appDataPath, fileName)
-    // console.log(appDataPath);
-
-    // // 保存证书到文件
-    // const saveResult = await writeFile(filePath, JSON.stringify(certObject, null, 2), { force })
-
     return certObject
   }
 )
@@ -166,5 +159,37 @@ ipcMain.handle(
         }
       )
     })
+  }
+)
+
+ipcMain.handle(
+  'gen-pkcs12',
+  async (
+    _event: IpcMainInvokeEvent,
+    filePath: string,
+    pfxPassword: string,
+    privateKeyPem: string,
+    certificatePem: string,
+    subjectCN?: string
+  ): Promise<void> => {
+    const privateKey = forge.pki.privateKeyFromPem(privateKeyPem)
+
+    console.log(certificatePem);
+    const certificate = forge.pki.certificateFromPem(certificatePem)
+    console.log(certificate);
+    // 生成 PKCS#12 ASN.1 结构
+    const p12Asn1 = forge.pkcs12.toPkcs12Asn1(
+      privateKey,
+      [certificate], // 可以传入多个证书（如证书链）
+      pfxPassword,
+      {
+        generateLocalKeyId: true, // 生成本地密钥 ID
+        friendlyName: subjectCN // 设置友好名称
+      }
+    )
+
+    // 转换为 DER 格式（二进制）
+    const p12Der = forge.asn1.toDer(p12Asn1).getBytes()
+    await writeFile(filePath, p12Der)
   }
 )

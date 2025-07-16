@@ -82,7 +82,8 @@ import { ElMessage, type FormInstance } from 'element-plus'
 import {
   createCertificate,
   type CreateCertResult,
-  type CertificateInfo
+  type CertificateInfo,
+  genPkcs12
 } from '@renderer/api/certificate'
 import { deepToRaw } from '@renderer/utils/index'
 import { openDirectoryDialog } from '@renderer/api/dialog'
@@ -132,17 +133,30 @@ const showCreateDialog = () => {
 const saveCertificates = async (certResult: CreateCertResult, dirName: string) => {
   // 打开目录选择对话框
   const dirPath = await openDirectoryDialog()
+  const certificatePath = `${dirPath}/${dirName}/certificate.pem`
+  const privatePath = `${dirPath}/${dirName}/private.key`
+  const publicKeyPath = `${dirPath}/${dirName}/public.key`
+  const p12Path = `${dirPath}/${dirName}/certificate.p12`
 
   if (dirPath) {
     try {
       // 保存证书文件
-      await saveFile(`${dirPath}/${dirName}/certificate.pem`, certResult.pem.certificate, {
+      await saveFile(certificatePath, certResult.pem.certificate, {
         force: true
       })
-      await saveFile(`${dirPath}/${dirName}/private.key`, certResult.pem.privateKey, {
+      await saveFile(privatePath, certResult.pem.privateKey, {
         force: true
       })
-      await saveFile(`${dirPath}/${dirName}/public.key`, certResult.pem.publicKey, { force: true })
+      await saveFile(publicKeyPath, certResult.pem.publicKey, { force: true })
+
+      // 生成证书文件 pkcs12
+      await genPkcs12(
+        p12Path,
+        'password',
+        certResult.pem.privateKey,
+        certResult.pem.certificate,
+        'friendlyName'
+      )
 
       ElMessage.success(`证书已保存到 ${dirPath}`)
     } catch (error) {

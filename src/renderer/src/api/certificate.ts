@@ -54,3 +54,28 @@ export const getTrustedRootCertificates = async (
 ): Promise<Certificate[]> => {
   return await window.electron.ipcRenderer.invoke('Get-TrustedRootCertificates', location)
 }
+
+/**
+ * 生成PKCS12格式的证书文件
+ * @param password  <PASSWORD>
+ * @param cert 证书
+ * @param key 私钥
+ * @param ca 根证书
+ * @returns PKCS12格式的证书文件
+ */
+export const genPkcs12 = async (
+  filePath: string,
+  pfxPassword: string,
+  certificatePem: string,
+  privateKeyPem: string,
+  subjectCN?: string
+): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke(
+    'gen-pkcs12',
+    filePath,
+    pfxPassword,
+    certificatePem,
+    privateKeyPem,
+    subjectCN
+  )
+}
