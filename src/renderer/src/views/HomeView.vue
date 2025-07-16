@@ -82,7 +82,7 @@ const fetchCertificates = async () => {
   loading.value = true
   try {
     const res = await getTrustedRootCertificates(location.value)
-    console.log(res);
+    console.log(res)
 
     certificates.value = res
     // 重置分页

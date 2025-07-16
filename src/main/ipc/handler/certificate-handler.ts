@@ -182,8 +182,6 @@ ipcMain.handle(
                 serialNumber
               }
             })
-
-            console.log(`获取到 ${data.length} 个证书`)
             resolve(data)
           } catch (parseError) {
             console.error('解析证书数据失败:', parseError)
