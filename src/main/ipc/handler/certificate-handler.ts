@@ -1,26 +1,14 @@
-import { ipcMain, IpcMainInvokeEvent, app } from 'electron'
+import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import forge from 'node-forge'
 import { exec } from 'child_process'
 import GetTrustedRootCertificates from '../../../../resources/Get-TrustedRootCertificates.ps1?asset&asarUnpack'
 import { writeFile } from '../../utility/file'
+import { CertificateCreateData, CreateCertResult } from '@dto/certificate'
 
 // 证书创建处理程序
 ipcMain.handle(
   'create-cert',
-  async (
-    _event: IpcMainInvokeEvent,
-    certInfo: {
-      commonName: string
-      country?: string
-      state?: string
-      locality?: string
-      organization?: string
-      organizationUnit?: string
-      altNames?: string[]
-      validityDays?: number
-      keySize?: number
-    }
-  ) => {
+  async (_event: IpcMainInvokeEvent, certInfo: CertificateCreateData) => {
     // 设置默认值
     const {
       commonName,
@@ -29,7 +17,7 @@ ipcMain.handle(
       locality = 'Beijing',
       organization = 'My Company',
       organizationUnit = 'Dev',
-      altNames = ['localhost'],
+      altNames = ['localhost', '127.0.0.1'],
       validityDays = 365,
       keySize = 2048
     } = certInfo
@@ -54,6 +42,7 @@ ipcMain.handle(
       { name: 'organizationName', value: organization },
       { shortName: 'OU', value: organizationUnit }
     ]
+
     cert.setSubject(attrs)
     cert.setIssuer(attrs) // 自签名证书的颁发者是自身
 
@@ -88,9 +77,8 @@ ipcMain.handle(
       publicKey: forge.pki.publicKeyToPem(keys.publicKey),
       certificate: forge.pki.certificateToPem(cert)
     }
-
     // 创建证书对象
-    const certObject = {
+    const certObject: CreateCertResult = {
       id: Date.now().toString(),
       subject: {
         commonName,
@@ -99,14 +87,22 @@ ipcMain.handle(
         locality,
         organization,
         organizationUnit,
-        altNames,
-        serialNumber: cert.serialNumber
+        altNames
       },
-      validFrom: cert.validity.notBefore.toISOString(),
-      validTo: cert.validity.notAfter.toISOString(),
-      pem
+      pem,
+      certInfo: {
+        subject: cert.subject.attributes.map((attr) => `${attr.name}=${attr.value}`).join(','),
+        issuer: cert.issuer.attributes.map((attr) => `${attr.name}=${attr.value}`).join(','),
+        thumbprint: forge.md.sha1
+          .create()
+          .update(forge.asn1.toDer(forge.pki.certificateToAsn1(cert)).getBytes())
+          .digest()
+          .toHex(),
+        notAfter: cert.validity.notAfter.toISOString(),
+        notBefore: cert.validity.notBefore.toISOString(),
+        serialNumber: cert.serialNumber
+      }
     }
-
     return certObject
   }
 )
@@ -167,29 +163,19 @@ ipcMain.handle(
   async (
     _event: IpcMainInvokeEvent,
     filePath: string,
-    pfxPassword: string,
+    password: string,
     privateKeyPem: string,
     certificatePem: string,
-    subjectCN?: string
+    friendlyName?: string
   ): Promise<void> => {
     const privateKey = forge.pki.privateKeyFromPem(privateKeyPem)
-
-    console.log(certificatePem);
     const certificate = forge.pki.certificateFromPem(certificatePem)
-    console.log(certificate);
-    // 生成 PKCS#12 ASN.1 结构
-    const p12Asn1 = forge.pkcs12.toPkcs12Asn1(
-      privateKey,
-      [certificate], // 可以传入多个证书（如证书链）
-      pfxPassword,
-      {
-        generateLocalKeyId: true, // 生成本地密钥 ID
-        friendlyName: subjectCN // 设置友好名称
-      }
-    )
-
-    // 转换为 DER 格式（二进制）
+    const p12Asn1 = forge.pkcs12.toPkcs12Asn1(privateKey, [certificate], password, {
+      generateLocalKeyId: true,
+      friendlyName: friendlyName
+    })
     const p12Der = forge.asn1.toDer(p12Asn1).getBytes()
-    await writeFile(filePath, p12Der)
+    // 将二进制数据写入文件
+    await writeFile(filePath, Buffer.from(p12Der, 'binary'))
   }
 )

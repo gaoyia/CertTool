@@ -43,3 +43,7 @@ foreach ($cert in $certificates) {
     Write-Output "----------"
 }
 $store.Close()
+
+# ÇÐ»»³Éutf8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+chcp 65001

@@ -63,12 +63,13 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { getTrustedRootCertificates } from '@renderer/api/certificate'
-import type { Certificate } from '@renderer/api/certificate'
+import { CertificateInfo } from '@dto/certificate'
+
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 
 // 证书列表数据
-const certificates = ref<Certificate[]>([])
+const certificates = ref<CertificateInfo[]>([])
 // 加载状态
 const loading = ref(false)
 // 证书存储位置

@@ -79,12 +79,8 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import {
-  createCertificate,
-  type CreateCertResult,
-  type CertificateInfo,
-  genPkcs12
-} from '@renderer/api/certificate'
+import { createCertificate, genPkcs12 } from '@renderer/api/certificate'
+import { CreateCertResult, CertificateCreateData } from '@dto/certificate'
 import { deepToRaw } from '@renderer/utils/index'
 import { openDirectoryDialog } from '@renderer/api/dialog'
 import { saveFile } from '@renderer/api/file'
@@ -95,17 +91,18 @@ const certificate = ref<CreateCertResult>()
 const certFormRef = ref<FormInstance>()
 const createDialogVisible = ref(false)
 const creating = ref(false)
-const certForm = ref<CertificateInfo>({
-  commonName: '',
+const defaultCertForm = {
+  commonName: 'test.example.com',
   country: 'CN',
-  state: '北京',
-  locality: '北京',
-  organization: '我的公司',
-  organizationUnit: '开发部',
-  altNames: ['localhost'],
+  state: 'Beijing',
+  locality: 'Beijing',
+  organization: 'Test Organization',
+  organizationUnit: 'IT',
+  altNames: ['localhost', '127.0.0.1'],
   validityDays: 365,
   keySize: 2048
-})
+}
+const certForm = ref<CertificateCreateData>(defaultCertForm)
 
 // 表单验证规则
 const rules = {
@@ -159,9 +156,9 @@ const saveCertificates = async (certResult: CreateCertResult, dirName: string) =
       )
 
       ElMessage.success(`证书已保存到 ${dirPath}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error('保存证书文件时出错:', error)
-      ElMessage.error('保存证书文件失败')
+      ElMessage.error('保存证书文件失败' + error.message)
     }
   }
 }
@@ -191,17 +188,7 @@ const createCert = async () => {
           await saveCertificates(result, dirName)
 
           // 重置表单
-          certForm.value = {
-            commonName: '',
-            country: 'CN',
-            state: '北京',
-            locality: '北京',
-            organization: '我的公司',
-            organizationUnit: '开发部',
-            altNames: ['localhost'],
-            validityDays: 365,
-            keySize: 2048
-          }
+          certForm.value = defaultCertForm
         } else {
           ElMessage.error('证书创建失败')
         }

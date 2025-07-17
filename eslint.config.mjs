@@ -26,6 +26,7 @@ export default tseslint.config(
       'vue/require-default-prop': 'off',
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       'vue/block-lang': [
         'error',
