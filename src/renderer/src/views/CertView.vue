@@ -1,6 +1,6 @@
 <template>
   <div class="cert">
-    <h1>证书管理</h1>
+    <h1>创建证书</h1>
 
     <!-- 证书列表 -->
     <div class="action">
@@ -64,6 +64,16 @@
             <el-option label="4096位" :value="4096" />
           </el-select>
         </el-form-item>
+
+        <fieldset>
+          <legend>生成P12文件需要</legend>
+          <el-form-item label="私钥密码" prop="country">
+            <el-input v-model="privatePassword" placeholder="私钥密码" />
+          </el-form-item>
+          <el-form-item label="友好的名称" prop="country">
+            <el-input v-model="friendlyName" placeholder="friendlyName " />
+          </el-form-item>
+        </fieldset>
       </el-form>
 
       <template #footer>
@@ -117,7 +127,14 @@ const rules = {
 const inputAltNameVisible = ref(false)
 const inputAltName = ref('')
 const inputAltNameRef = ref()
+const privatePassword = ref('password')
+const friendlyName = ref('friendlyName')
 
+function setDefaultForm() {
+  friendlyName.value = 'friendlyName'
+  privatePassword.value = 'password'
+  certForm.value = defaultCertForm
+}
 // 显示创建证书对话框
 const showCreateDialog = () => {
   createDialogVisible.value = true
@@ -149,10 +166,10 @@ const saveCertificates = async (certResult: CreateCertResult, dirName: string) =
       // 生成证书文件 pkcs12
       await genPkcs12(
         p12Path,
-        'password',
+        privatePassword.value,
         certResult.pem.privateKey,
         certResult.pem.certificate,
-        'friendlyName'
+        friendlyName.value
       )
 
       ElMessage.success(`证书已保存到 ${dirPath}`)
@@ -188,7 +205,7 @@ const createCert = async () => {
           await saveCertificates(result, dirName)
 
           // 重置表单
-          certForm.value = defaultCertForm
+          setDefaultForm()
         } else {
           ElMessage.error('证书创建失败')
         }

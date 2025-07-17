@@ -6,14 +6,13 @@ import { is } from '@electron-toolkit/utils'
 export default class MainWindow {
   static win: Electron.BrowserWindow | null = null
   constructor() {
-    console.log(MainWindow.win)
-    console.log(MainWindow.win?.isDestroyed())
-
     if (!MainWindow.win || MainWindow.win.isDestroyed()) {
       // Create the browser window.
       MainWindow.win = new BrowserWindow({
-        width: 900,
-        height: 670,
+        width: 1000,
+        height: 800,
+        minHeight: 800,
+        minWidth: 1000,
         show: false,
         autoHideMenuBar: true,
         ...(process.platform === 'linux' ? { icon } : {}),
