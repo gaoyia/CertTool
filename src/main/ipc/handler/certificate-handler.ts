@@ -2,6 +2,9 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import forge from 'node-forge'
 import { exec } from 'child_process'
 import GetTrustedRootCertificates from '../../../../resources/Get-TrustedRootCertificates.ps1?asset&asarUnpack'
+import ImportCertificateTrust from '../../../../resources/Import-CertificateTrust.ps1?asset&asarUnpack'
+import CheckCertificateTrust from '../../../../resources/Check-CertificateTrust.ps1?asset&asarUnpack'
+import RemoveCertificateTrust from '../../../../resources/Remove-CertificateTrust.ps1?asset&asarUnpack'
 import { writeFile } from '../../utility/file'
 import { CertificateCreateData, CreateCertResult } from '@dto/certificate'
 
@@ -28,12 +31,12 @@ ipcMain.handle(
     // 创建证书
     const cert = forge.pki.createCertificate()
     cert.publicKey = keys.publicKey
-    cert.serialNumber = Date.now().toString(16) // 使用时间戳作为序列号
+    cert.serialNumber = Date.now().toString(16)
     cert.validity.notBefore = new Date()
     cert.validity.notAfter = new Date()
     cert.validity.notAfter.setDate(cert.validity.notBefore.getDate() + validityDays)
 
-    // 设置证书主题（Subject）
+    // 设置证书主题
     const attrs = [
       { name: 'commonName', value: commonName },
       { name: 'countryName', value: country },
@@ -44,9 +47,9 @@ ipcMain.handle(
     ]
 
     cert.setSubject(attrs)
-    cert.setIssuer(attrs) // 自签名证书的颁发者是自身
+    cert.setIssuer(attrs)
 
-    // 添加扩展（如 Subject Alternative Name）
+    // 添加扩展
     const altNameObjects = altNames.map((name) => ({ type: 2, value: name }))
 
     cert.setExtensions([
@@ -71,12 +74,13 @@ ipcMain.handle(
     // 自签名
     cert.sign(keys.privateKey, forge.md.sha256.create())
 
-    // 导出 PEM 格式
+    // 导出PEM格式
     const pem = {
       privateKey: forge.pki.privateKeyToPem(keys.privateKey),
       publicKey: forge.pki.publicKeyToPem(keys.publicKey),
       certificate: forge.pki.certificateToPem(cert)
     }
+
     // 创建证书对象
     const certObject: CreateCertResult = {
       id: Date.now().toString(),
@@ -122,29 +126,21 @@ ipcMain.handle(
           }
           if (stderr) {
             console.error(`PowerShell 错误: ${stderr}`)
-            // 有些PowerShell命令会输出到stderr但仍然成功执行，所以这里只记录不拒绝
           }
 
           try {
-            // 使用分隔符分割
             const certificates = stdout.split('----------')
-            certificates.pop() // 移除最后一个空元素
+            certificates.pop()
 
             const data = certificates.map((certificate) => {
               const lines = certificate.split(/\r?\n/).filter((item) => item !== '')
-              const subject = lines[0]
-              const issuer = lines[1]
-              const thumbprint = lines[2]
-              const notAfter = lines[3]
-              const notBefore = lines[4]
-              const serialNumber = lines[5]
               return {
-                subject,
-                issuer,
-                thumbprint,
-                notAfter,
-                notBefore,
-                serialNumber
+                subject: lines[0],
+                issuer: lines[1],
+                thumbprint: lines[2],
+                notAfter: lines[3],
+                notBefore: lines[4],
+                serialNumber: lines[5]
               }
             })
             resolve(data)
@@ -158,6 +154,125 @@ ipcMain.handle(
   }
 )
 
+// 导入证书到信任存储处理程序
+ipcMain.handle(
+  'Import-CertificateTrust',
+  async (
+    _event: IpcMainInvokeEvent,
+    filePath: string,
+    storeLocation: 'LocalMachine' | 'CurrentUser' = 'LocalMachine',
+    storeName: 'Root' | 'CA' = 'Root'
+  ) => {
+    return new Promise((resolve, reject) => {
+      exec(
+        `powershell.exe -ExecutionPolicy Bypass -File "${ImportCertificateTrust}" -FilePath "${filePath}" -StoreLocation ${storeLocation} -StoreName ${storeName}`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`执行错误: ${error}`)
+            reject(new Error(`执行错误: ${error.message}`))
+            return
+          }
+          if (stderr) {
+            console.error(`PowerShell 错误: ${stderr}`)
+          }
+          resolve(stdout)
+        }
+      )
+    })
+  }
+)
+
+// 检查证书是否信任处理程序
+ipcMain.handle(
+  'Check-CertificateTrust',
+  async (
+    _event: IpcMainInvokeEvent,
+    options: {
+      thumbprint?: string
+      subject?: string
+      storeLocation?: 'LocalMachine' | 'CurrentUser'
+      storeName?: 'Root' | 'CA'
+    }
+  ) => {
+    const { thumbprint, subject, storeLocation = 'LocalMachine', storeName = 'Root' } = options
+
+    return new Promise((resolve, reject) => {
+      let command = `powershell.exe -ExecutionPolicy Bypass -File "${CheckCertificateTrust}" -StoreLocation ${storeLocation} -StoreName ${storeName}`
+
+      if (thumbprint) {
+        command += ` -Thumbprint "${thumbprint}"`
+      } else if (subject) {
+        command += ` -Subject "${subject}"`
+      }
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`执行错误: ${error}`)
+          reject(new Error(`执行错误: ${error.message}`))
+          return
+        }
+        if (stderr) {
+          console.error(`PowerShell 错误: ${stderr}`)
+        }
+
+        try {
+          const certificates = stdout.split('----------')
+          certificates.pop()
+
+          const data = certificates.map((certificate) => {
+            const lines = certificate.split(/\r?\n/).filter((item) => item !== '')
+            return {
+              subject: lines[0],
+              issuer: lines[1],
+              thumbprint: lines[2],
+              notAfter: lines[3],
+              notBefore: lines[4],
+              serialNumber: lines[5]
+            }
+          })
+          resolve(data)
+        } catch (parseError) {
+          console.error('解析证书数据失败:', parseError)
+          reject(new Error(`解析证书数据失败: ${(parseError as Error).message}`))
+        }
+      })
+    })
+  }
+)
+
+// 从信任存储删除证书处理程序
+ipcMain.handle(
+  'Remove-CertificateTrust',
+  async (
+    _event: IpcMainInvokeEvent,
+    thumbprint: string,
+    storeLocation: 'LocalMachine' | 'CurrentUser' = 'LocalMachine',
+    storeName: 'Root' | 'CA' = 'Root',
+    force: boolean = false
+  ) => {
+    return new Promise((resolve, reject) => {
+      let command = `powershell.exe -ExecutionPolicy Bypass -File "${RemoveCertificateTrust}" -Thumbprint "${thumbprint}" -StoreLocation ${storeLocation} -StoreName ${storeName}`
+
+      if (force) {
+        command += ' -Force'
+      }
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`执行错误: ${error}`)
+          reject(new Error(`执行错误: ${error.message}`))
+          return
+        }
+        if (stderr) {
+          console.error(`PowerShell 错误: ${stderr}`)
+        }
+        resolve(stdout)
+      })
+    })
+  }
+)
+
+// 生成PKCS12证书处理程序
 ipcMain.handle(
   'gen-pkcs12',
   async (
@@ -175,7 +290,6 @@ ipcMain.handle(
       friendlyName: friendlyName
     })
     const p12Der = forge.asn1.toDer(p12Asn1).getBytes()
-    // 将二进制数据写入文件
     await writeFile(filePath, Buffer.from(p12Der, 'binary'))
   }
 )

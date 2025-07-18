@@ -5,7 +5,7 @@
     size="50%"
     @closed="onDrawerClosed"
   >
-    <div style="margin-bottom: 15px; text-align: right;">
+    <div style="margin-bottom: 15px; text-align: right">
       <el-dropdown split-button type="primary" size="small" @click="exportAll('all')">
         批量导出
         <template #dropdown>
@@ -63,7 +63,12 @@
         <div class="code-block">
           <pre>{{ certificate?.pem.privateKey }}</pre>
           <div class="button-group">
-            <el-dropdown split-button type="primary" size="small" @click="copyToClipboard(certificate?.pem.privateKey)">
+            <el-dropdown
+              split-button
+              type="primary"
+              size="small"
+              @click="copyToClipboard(certificate?.pem.privateKey)"
+            >
               复制
               <template #dropdown>
                 <el-dropdown-menu>
@@ -84,7 +89,12 @@
         <div class="code-block">
           <pre>{{ certificate?.pem.publicKey }}</pre>
           <div class="button-group">
-            <el-dropdown split-button type="primary" size="small" @click="copyToClipboard(certificate?.pem.publicKey)">
+            <el-dropdown
+              split-button
+              type="primary"
+              size="small"
+              @click="copyToClipboard(certificate?.pem.publicKey)"
+            >
               复制
               <template #dropdown>
                 <el-dropdown-menu>
@@ -276,7 +286,7 @@ const exportPrivateKey = async (format: 'pem' | 'key', filePath?: string) => {
 const exportPublicKey = async (format: 'pem' | 'key', filePath?: string) => {
   if (!props.certificate) return
   const defaultFileName = `public_key.${format}`
-  const finalPath = filePath || await getSavePath('公钥文件', format, defaultFileName)
+  const finalPath = filePath || (await getSavePath('公钥文件', format, defaultFileName))
   if (!finalPath) return
 
   try {
@@ -292,15 +302,15 @@ const exportPublicKey = async (format: 'pem' | 'key', filePath?: string) => {
 const exportP12 = async (filePath?: string) => {
   if (!props.certificate) return
   const defaultFileName = 'certificate.p12'
-  const finalPath = filePath || await getSavePath('P12证书文件', 'p12', defaultFileName)
+  const finalPath = filePath || (await getSavePath('P12证书文件', 'p12', defaultFileName))
   if (!finalPath) return
-console.log(
-      finalPath,
-      props.privatePassword,
-      props.certificate.pem.privateKey,
-      props.certificate.pem.certificate,
-      props.friendlyName
-    );
+  console.log(
+    finalPath,
+    props.privatePassword,
+    props.certificate.pem.privateKey,
+    props.certificate.pem.certificate,
+    props.friendlyName
+  )
 
   try {
     await genPkcs12(

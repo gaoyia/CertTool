@@ -41,3 +41,49 @@ export const genPkcs12 = (
     friendlyName
   )
 }
+
+/**
+ * 导入证书到信任存储
+ */
+export const importCertificateTrust = async (
+  filePath: string,
+  storeLocation: 'LocalMachine' | 'CurrentUser' = 'LocalMachine',
+  storeName: 'Root' | 'CA' = 'Root'
+): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke(
+    'Import-CertificateTrust',
+    filePath,
+    storeLocation,
+    storeName
+  )
+}
+
+/**
+ * 检查证书是否信任
+ */
+export const checkCertificateTrust = async (options: {
+  thumbprint?: string
+  subject?: string
+  storeLocation?: 'LocalMachine' | 'CurrentUser'
+  storeName?: 'Root' | 'CA'
+}): Promise<CertificateInfo[]> => {
+  return await window.electron.ipcRenderer.invoke('Check-CertificateTrust', options)
+}
+
+/**
+ * 从信任存储删除证书
+ */
+export const removeCertificateTrust = async (
+  thumbprint: string,
+  storeLocation: 'LocalMachine' | 'CurrentUser' = 'LocalMachine',
+  storeName: 'Root' | 'CA' = 'Root',
+  force: boolean = false
+): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke(
+    'Remove-CertificateTrust',
+    thumbprint,
+    storeLocation,
+    storeName,
+    force
+  )
+}

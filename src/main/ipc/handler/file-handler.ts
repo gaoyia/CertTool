@@ -57,3 +57,9 @@ ipcMain.handle(
 ipcMain.handle('get-app-data-path', (_event: IpcMainInvokeEvent): string => {
   return getAppDataPath()
 })
+
+// 获取路径
+type GetPathParams = Parameters<typeof app.getPath>[0]
+ipcMain.handle('getPath', (_event: IpcMainInvokeEvent, name: GetPathParams): string => {
+  return app.getPath(name)
+})

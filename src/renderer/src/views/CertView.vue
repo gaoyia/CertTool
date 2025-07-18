@@ -31,11 +31,20 @@
             <p><strong>序列号:</strong> {{ row.certInfo.serialNumber }}</p>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120">
+        <el-table-column label="操作" width="220">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="showCertDetails(row)"
               >查看详情</el-button
             >
+            <br />
+            <el-button
+              type="success"
+              size="small"
+              :loading="trusting"
+              @click="trustCertificate(row)"
+            >
+              一键信任
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -135,6 +144,43 @@ import { createCertificate } from '@renderer/api/certificate'
 import { CreateCertResult, CertificateCreateData } from '@dto/certificate'
 import { deepToRaw } from '@renderer/utils/index'
 import CertificateDetailDrawer from '@renderer/components/CertificateDetailDrawer.vue'
+import { importCertificateTrust, checkCertificateTrust } from '@renderer/api/certificate'
+import { deleteFile, saveFile } from '@renderer/api'
+
+// 一键信任证书
+const trusting = ref(false)
+const trustCertificate = async (cert: CreateCertResult) => {
+  trusting.value = true
+  try {
+    // 首先检查证书是否已信任
+    const trustedCerts = await checkCertificateTrust({
+      thumbprint: cert.certInfo.thumbprint
+    })
+
+    if (trustedCerts && trustedCerts.length > 0) {
+      ElMessage.warning('该证书已在信任存储中')
+      return
+    }
+
+    // 创建临时文件
+    const tempPath = await window.electron.ipcRenderer.invoke('getPath', 'temp')
+    const certFilePath = `${tempPath}/${cert.id}.crt`
+    await saveFile(certFilePath, cert.pem.certificate)
+
+    // 导入证书到信任存储
+    await importCertificateTrust(certFilePath, 'LocalMachine', 'Root')
+
+    // 删除临时文件
+    await deleteFile(certFilePath)
+
+    ElMessage.success('证书已成功添加到信任存储')
+  } catch (error) {
+    console.error('信任证书时出错:', error)
+    ElMessage.error('信任证书失败: ' + (error as Error).message)
+  } finally {
+    trusting.value = false
+  }
+}
 // 证书列表
 const certificate = ref<CreateCertResult>()
 
@@ -299,5 +345,8 @@ const removeAltName = (index: number) => {
   border-radius: 4px;
 }
 
-/* 抽屉相关样式已移至CertificateDetailDrawer组件 */
+/* 在style部分添加以下样式 */
+.el-table .el-button {
+  margin: 2px 0;
+}
 </style>
