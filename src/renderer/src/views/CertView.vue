@@ -7,6 +7,73 @@
       <el-button type="primary" @click="showCreateDialog">创建证书</el-button>
     </div>
 
+    <!-- 证书信息展示区域 -->
+    <div v-if="certificate" class="cert-info-container">
+      <h2>证书信息</h2>
+      <el-table :data="[certificate]" border style="width: 100%">
+        <el-table-column prop="id" label="证书ID" width="180" />
+        <el-table-column label="主题信息">
+          <template #default="{ row }">
+            <p><strong>通用名称:</strong> {{ row.subject.commonName }}</p>
+            <p><strong>国家:</strong> {{ row.subject.country }}</p>
+            <p><strong>省/州:</strong> {{ row.subject.state }}</p>
+            <p><strong>地区:</strong> {{ row.subject.locality }}</p>
+            <p><strong>组织:</strong> {{ row.subject.organization }}</p>
+            <p><strong>组织单位:</strong> {{ row.subject.organizationUnit }}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="证书详情">
+          <template #default="{ row }">
+            <p><strong>颁发者:</strong> {{ row.certInfo.issuer }}</p>
+            <p><strong>指纹:</strong> {{ row.certInfo.thumbprint }}</p>
+            <p><strong>有效期从:</strong> {{ formatDate(row.certInfo.notBefore) }}</p>
+            <p><strong>有效期至:</strong> {{ formatDate(row.certInfo.notAfter) }}</p>
+            <p><strong>序列号:</strong> {{ row.certInfo.serialNumber }}</p>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120">
+          <template #default="{ row }">
+            <el-button type="primary" size="small" @click="showCertDetails(row)">查看详情</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+    <!-- 证书详情抽屉 -->
+    <el-drawer v-model="drawerVisible" title="证书详细信息" size="50%">
+      <el-tabs>
+        <el-tab-pane label="证书">
+          <div class="code-block">
+            <pre>{{ selectedCert?.pem.certificate }}</pre>
+            <el-button type="primary" size="small" @click="copyToClipboard(selectedCert?.pem.certificate)">
+              复制
+            </el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="私钥">
+          <div class="code-block">
+            <pre>{{ selectedCert?.pem.privateKey }}</pre>
+            <el-button type="primary" size="small" @click="copyToClipboard(selectedCert?.pem.privateKey)">
+              复制
+            </el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="公钥">
+          <div class="code-block">
+            <pre>{{ selectedCert?.pem.publicKey }}</pre>
+            <el-button type="primary" size="small" @click="copyToClipboard(selectedCert?.pem.publicKey)">
+              复制
+            </el-button>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="备用名称" v-if="selectedCert?.subject.altNames?.length">
+          <el-tag v-for="(name, index) in selectedCert?.subject.altNames" :key="index" style="margin: 5px">
+            {{ name }}
+          </el-tag>
+        </el-tab-pane>
+      </el-tabs>
+    </el-drawer>
+
     <!-- 创建证书对话框 -->
     <el-dialog v-model="createDialogVisible" title="创建证书" width="60%">
       <el-form ref="certFormRef" :model="certForm" label-width="120px" :rules="rules">
@@ -96,6 +163,36 @@ import { openDirectoryDialog } from '@renderer/api/dialog'
 import { saveFile } from '@renderer/api/file'
 // 证书列表
 const certificate = ref<CreateCertResult>()
+
+// 抽屉控制
+const drawerVisible = ref(false)
+const selectedCert = ref<CreateCertResult | null>(null)
+
+// 显示证书详情
+const showCertDetails = (cert: CreateCertResult) => {
+  selectedCert.value = cert
+  drawerVisible.value = true
+}
+
+// 复制到剪贴板功能
+const copyToClipboard = (text?: string) => {
+  if (!text) return
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      ElMessage.success('已复制到剪贴板')
+    })
+    .catch(err => {
+      console.error('复制失败:', err)
+      ElMessage.error('复制失败')
+    })
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return ''
+  return new Date(dateStr).toLocaleString()
+}
 
 // 创建证书表单
 const certFormRef = ref<FormInstance>()
@@ -272,5 +369,33 @@ const removeAltName = (index: number) => {
 .copy-action {
   margin-top: 10px;
   text-align: right;
+}
+
+.cert-info-container {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+}
+
+.code-block {
+  position: relative;
+  background-color: #f5f7fa;
+  padding: 15px;
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.code-block pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.code-block .el-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 </style>
