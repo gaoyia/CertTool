@@ -5,7 +5,7 @@ const options = {
   key: fs.readFileSync('private_key.pem'),
   cert: fs.readFileSync('certificate.pem')
 }
-console.log('Server running at https://127.0.0.1:8000')
+console.log('Server running at https://localhost:8000')
 
 https
   .createServer(options, (req, res) => {

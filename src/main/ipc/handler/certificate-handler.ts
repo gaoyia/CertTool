@@ -105,7 +105,25 @@ ipcMain.handle(
           .toHex(),
         notAfter: cert.validity.notAfter.toISOString(),
         notBefore: cert.validity.notBefore.toISOString(),
-        serialNumber: cert.serialNumber
+        serialNumber: cert.serialNumber,
+        parsedSubject: {
+          commonName,
+          country,
+          state,
+          locality,
+          organization,
+          organizationUnit,
+          altNames
+        },
+        parsedIssuer: {
+          commonName,
+          country,
+          state,
+          locality,
+          organization,
+          organizationUnit,
+          altNames
+        }
       }
     }
     return certObject

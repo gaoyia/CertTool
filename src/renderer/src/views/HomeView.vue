@@ -75,16 +75,26 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="thumbprint" label="指纹" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="serialNumber" label="序列号" min-width="150" show-overflow-tooltip />
-        <el-table-column label="有效期起始时间" min-width="180">
+        <el-table-column label="指纹与序列号" min-width="220">
           <template #default="scope">
+            <div>
+              <p><strong>指纹:</strong> {{ scope.row.thumbprint }}</p>
+              <p><strong>序列号:</strong> {{ scope.row.serialNumber }}</p>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="有效期" min-width="180">
+          <template #default="scope">
+            <div>
+              <p><strong>起始时间:</strong> {{ scope.row.notBefore }}</p>
+              <p><strong>截止时间:</strong> {{ scope.row.notAfter }}</p>
+            </div>
             {{ formatDate(scope.row.notBefore) }}
           </template>
         </el-table-column>
-        <el-table-column label="有效期截止时间" min-width="180">
+        <el-table-column label="操作" align="center" min-width="120">
           <template #default="scope">
-            {{ formatDate(scope.row.notAfter) }}
+            <el-button type="danger" @click="deleteCertificate(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -108,16 +118,17 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
-import { getTrustedRootCertificates } from '@renderer/api/certificate'
+import { getTrustedRootCertificates, removeCertificateTrust } from '@renderer/api/certificate'
 import { CertificateInfo } from '@dto/certificate'
 
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
+import { deepToRaw } from '@renderer/utils'
 
 // 证书列表数据
 const certificates = ref<CertificateInfo[]>([])
 // 筛选文本
-const filterText = ref('Test Organization')
+const filterText = ref('Cert-Tool')
 // 加载状态
 const loading = ref(false)
 // 证书存储位置
@@ -178,6 +189,19 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val
 }
 
+// 删除证书
+const deleteCertificate = async (cert: CertificateInfo) => {
+  console.log(cert);
+  try {
+    await removeCertificateTrust(cert.thumbprint, location.value, 'Root', true)
+    ElMessage.success('证书删除成功')
+    // 重新获取证书列表
+    fetchCertificates()
+  } catch (error: any) {
+    console.error('删除证书时出错:', error)
+    ElMessage.error('证书删除失败: ' + error.message)
+  }
+}
 // 页面加载时获取证书列表
 onMounted(() => {
   fetchCertificates()

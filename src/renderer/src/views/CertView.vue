@@ -206,11 +206,11 @@ const certFormRef = ref<FormInstance>()
 const createDialogVisible = ref(false)
 const creating = ref(false)
 const defaultCertForm = {
-  commonName: 'test.example.com',
+  commonName: 'localhost',
   country: 'CN',
   state: 'Beijing',
   locality: 'Beijing',
-  organization: 'Test Organization',
+  organization: 'Cert-Tool',
   organizationUnit: 'IT',
   altNames: ['localhost', '127.0.0.1'],
   validityDays: 365,
