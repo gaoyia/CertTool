@@ -1,0 +1,13 @@
+{
+  "name": "https-server-test",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "测试HTTPS服务器，用于验证证书是否能正确使用",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "koa": "^2.14.2"
+  }
+}

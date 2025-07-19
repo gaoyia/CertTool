@@ -4,3 +4,7 @@ out
 .DS_Store
 .eslintcache
 *.log*
+
+/test/httpServer/*
+!/test/httpServer/index.js
+!/test/httpServer/package.json

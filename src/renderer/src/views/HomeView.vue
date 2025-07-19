@@ -2,7 +2,7 @@
   <div class="home">
     <div class="header">
       <h1>证书管理工具</h1>
-      <el-button type="primary" @click="fetchCertificates" :loading="loading">
+      <el-button type="primary" :loading="loading" @click="fetchCertificates">
         <el-icon><Refresh /></el-icon>
         刷新列表
       </el-button>
@@ -12,23 +12,69 @@
       <template #header>
         <div class="card-header">
           <span>受信任的根证书列表</span>
-          <el-select v-model="location" @change="fetchCertificates" size="small">
+          <el-select v-model="location" size="small" @change="fetchCertificates">
             <el-option label="本地计算机" value="LocalMachine" />
             <el-option label="当前用户" value="CurrentUser" />
           </el-select>
         </div>
       </template>
 
+      <div class="filter-container">
+        <el-input
+          v-model="filterText"
+          placeholder="输入关键词筛选(通用名称/组织/指纹)"
+          clearable
+          style="width: 300px; margin-right: 10px"
+        />
+        <span v-if="filterText" class="filter-count">
+          找到 {{ filteredCertificates.length }} 个匹配项
+        </span>
+      </div>
+
       <el-table
         v-loading="loading"
-        :data="certificates"
+        :data="filterText ? filteredCertificates : certificates"
         style="width: 100%"
         border
         stripe
         height="calc(100vh - 200px)"
       >
-        <el-table-column prop="subject" label="主题" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="issuer" label="颁发者" min-width="200" show-overflow-tooltip />
+        <el-table-column label="主题" min-width="220">
+          <template #default="scope">
+            <div v-if="scope.row.parsedSubject">
+              <p v-if="scope.row.parsedSubject.commonName">
+                <strong>CN:</strong> {{ scope.row.parsedSubject.commonName }}
+              </p>
+              <p v-if="scope.row.parsedSubject.organization">
+                <strong>O:</strong> {{ scope.row.parsedSubject.organization }}
+              </p>
+              <p v-if="scope.row.parsedSubject.organizationUnit">
+                <strong>OU:</strong> {{ scope.row.parsedSubject.organizationUnit }}
+              </p>
+              <p v-if="scope.row.parsedSubject.country">
+                <strong>C:</strong> {{ scope.row.parsedSubject.country }}
+              </p>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="颁发者" min-width="220">
+          <template #default="scope">
+            <div v-if="scope.row.parsedIssuer">
+              <p v-if="scope.row.parsedIssuer.commonName">
+                <strong>CN:</strong> {{ scope.row.parsedIssuer.commonName }}
+              </p>
+              <p v-if="scope.row.parsedIssuer.organization">
+                <strong>O:</strong> {{ scope.row.parsedIssuer.organization }}
+              </p>
+              <p v-if="scope.row.parsedIssuer.organizationUnit">
+                <strong>OU:</strong> {{ scope.row.parsedIssuer.organizationUnit }}
+              </p>
+              <p v-if="scope.row.parsedIssuer.country">
+                <strong>C:</strong> {{ scope.row.parsedIssuer.country }}
+              </p>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="thumbprint" label="指纹" min-width="150" show-overflow-tooltip />
         <el-table-column prop="serialNumber" label="序列号" min-width="150" show-overflow-tooltip />
         <el-table-column label="有效期起始时间" min-width="180">
@@ -61,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getTrustedRootCertificates } from '@renderer/api/certificate'
 import { CertificateInfo } from '@dto/certificate'
 
@@ -70,6 +116,8 @@ import { Refresh } from '@element-plus/icons-vue'
 
 // 证书列表数据
 const certificates = ref<CertificateInfo[]>([])
+// 筛选文本
+const filterText = ref('Test Organization')
 // 加载状态
 const loading = ref(false)
 // 证书存储位置
@@ -77,6 +125,21 @@ const location = ref<'LocalMachine' | 'CurrentUser'>('LocalMachine')
 // 分页相关
 const currentPage = ref(1)
 const pageSize = ref(20)
+
+// 筛选后的证书列表
+const filteredCertificates = computed(() => {
+  if (!filterText.value) {
+    return certificates.value
+  }
+  const searchText = filterText.value.toLowerCase()
+  return certificates.value.filter((cert) => {
+    return (
+      cert.parsedSubject?.commonName?.toLowerCase().includes(searchText) ||
+      cert.parsedSubject?.organization?.toLowerCase().includes(searchText) ||
+      cert.thumbprint?.toLowerCase().includes(searchText)
+    )
+  })
+})
 
 // 获取证书列表
 const fetchCertificates = async () => {

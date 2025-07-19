@@ -137,7 +137,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="备用名称" v-if="certificate?.subject.altNames?.length">
+      <el-tab-pane v-if="certificate?.subject.altNames?.length" label="备用名称">
         <el-tag
           v-for="(name, index) in certificate?.subject.altNames"
           :key="index"

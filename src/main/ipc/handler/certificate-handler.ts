@@ -6,6 +6,7 @@ import ImportCertificateTrust from '../../../../resources/Import-CertificateTrus
 import CheckCertificateTrust from '../../../../resources/Check-CertificateTrust.ps1?asset&asarUnpack'
 import RemoveCertificateTrust from '../../../../resources/Remove-CertificateTrust.ps1?asset&asarUnpack'
 import { writeFile } from '../../utility/file'
+import { parseDN } from '../../utility/certificate'
 import { CertificateCreateData, CreateCertResult } from '@dto/certificate'
 
 // 证书创建处理程序
@@ -140,7 +141,9 @@ ipcMain.handle(
                 thumbprint: lines[2],
                 notAfter: lines[3],
                 notBefore: lines[4],
-                serialNumber: lines[5]
+                serialNumber: lines[5],
+                parsedSubject: parseDN(lines[0]),
+                parsedIssuer: parseDN(lines[1])
               }
             })
             resolve(data)

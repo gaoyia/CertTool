@@ -23,6 +23,8 @@ export interface CertificateInfo {
   notAfter: string
   notBefore: string
   serialNumber: string
+  parsedSubject: CertificateCreateData
+  parsedIssuer: CertificateCreateData
 }
 export interface PemInfo {
   certificate: string

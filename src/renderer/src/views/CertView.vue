@@ -69,6 +69,7 @@
           <el-tag
             v-for="(altName, index) in certForm.altNames"
             :key="index"
+            closable
             @close="removeAltName(index)"
           >
             {{ altName }}
