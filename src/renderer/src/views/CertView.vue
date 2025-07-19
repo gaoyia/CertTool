@@ -1,6 +1,7 @@
 <template>
   <div class="cert">
     <h1>创建证书</h1>
+    <p style="color: firebrick">说明：这里创建的证书，仅保存在内存中，如需使用请及时导出文件。</p>
 
     <!-- 证书列表 -->
     <div class="action">
@@ -211,7 +212,7 @@ const defaultCertForm = {
   state: 'Beijing',
   locality: 'Beijing',
   organization: 'Cert-Tool',
-  organizationUnit: 'IT',
+  organizationUnit: 'Cert-Tool',
   altNames: ['localhost', '127.0.0.1'],
   validityDays: 365,
   keySize: 2048
@@ -312,10 +313,6 @@ const removeAltName = (index: number) => {
 </script>
 
 <style scoped>
-.cert {
-  padding: 20px;
-}
-
 .cert-list {
   margin-bottom: 20px;
 }

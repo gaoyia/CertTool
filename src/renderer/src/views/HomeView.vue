@@ -2,20 +2,22 @@
   <div class="home">
     <div class="header">
       <h1>证书管理工具</h1>
-      <el-button type="primary" :loading="loading" @click="fetchCertificates">
-        <el-icon><Refresh /></el-icon>
-        刷新列表
-      </el-button>
+      <div class="header-controls">
+        <el-select v-model="location" style="width: 120px" @change="fetchCertificates">
+          <el-option label="本地计算机" value="LocalMachine" />
+          <el-option label="当前用户" value="CurrentUser" />
+        </el-select>
+        <el-button type="primary" :loading="loading" @click="fetchCertificates">
+          <el-icon><Refresh /></el-icon>
+          刷新列表
+        </el-button>
+      </div>
     </div>
 
     <el-card class="certificate-card">
       <template #header>
         <div class="card-header">
           <span>受信任的根证书列表</span>
-          <el-select v-model="location" size="small" @change="fetchCertificates">
-            <el-option label="本地计算机" value="LocalMachine" />
-            <el-option label="当前用户" value="CurrentUser" />
-          </el-select>
         </div>
       </template>
 
@@ -29,6 +31,16 @@
         <span v-if="filterText" class="filter-count">
           找到 {{ filteredCertificates.length }} 个匹配项
         </span>
+
+        <el-button
+          v-if="filterText !== 'Cert-Tool'"
+          type="primary"
+          :loading="loading"
+          @click="filterText = 'Cert-Tool'"
+        >
+          <el-icon><StarFilled /></el-icon>
+          切换回默认值
+        </el-button>
       </div>
 
       <el-table
@@ -86,10 +98,9 @@
         <el-table-column label="有效期" min-width="180">
           <template #default="scope">
             <div>
-              <p><strong>起始时间:</strong> {{ scope.row.notBefore }}</p>
-              <p><strong>截止时间:</strong> {{ scope.row.notAfter }}</p>
+              <p><strong>起始时间:</strong> {{ formatDate(scope.row.notBefore) }}</p>
+              <p><strong>截止时间:</strong> {{ formatDate(scope.row.notAfter) }}</p>
             </div>
-            {{ formatDate(scope.row.notBefore) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" min-width="120">
@@ -99,7 +110,7 @@
         </el-table-column>
       </el-table>
 
-      <div class="pagination-container" v-if="certificates.length > 0">
+      <div v-if="certificates.length > 0" class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
@@ -122,9 +133,7 @@ import { getTrustedRootCertificates, removeCertificateTrust } from '@renderer/ap
 import { CertificateInfo } from '@dto/certificate'
 
 import { ElMessage } from 'element-plus'
-import { Refresh } from '@element-plus/icons-vue'
-import { deepToRaw } from '@renderer/utils'
-
+import { Refresh, StarFilled } from '@element-plus/icons-vue'
 // 证书列表数据
 const certificates = ref<CertificateInfo[]>([])
 // 筛选文本
@@ -175,7 +184,7 @@ const formatDate = (dateString: string) => {
   try {
     const date = new Date(dateString)
     return date.toLocaleString('zh-CN')
-  } catch (error) {
+  } catch {
     return dateString
   }
 }
@@ -191,7 +200,6 @@ const handleCurrentChange = (val: number) => {
 
 // 删除证书
 const deleteCertificate = async (cert: CertificateInfo) => {
-  console.log(cert);
   try {
     await removeCertificateTrust(cert.thumbprint, location.value, 'Root', true)
     ElMessage.success('证书删除成功')
@@ -209,15 +217,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.home {
-  padding: 20px;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .certificate-card {
@@ -230,9 +233,19 @@ onMounted(() => {
   align-items: center;
 }
 
+.filter-container {
+  margin-bottom: 1rem;
+}
+
 .pagination-container {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 控制选择框和按钮之间的间距 */
 }
 </style>

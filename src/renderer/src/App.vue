@@ -5,8 +5,8 @@
 <template>
   <div class="app-container">
     <el-menu mode="horizontal" router>
-      <el-menu-item index="/">首页</el-menu-item>
-      <el-menu-item index="/cert">证书管理</el-menu-item>
+      <el-menu-item index="/">证书管理</el-menu-item>
+      <el-menu-item index="/cert">创建证书</el-menu-item>
       <el-menu-item index="/about">关于</el-menu-item>
     </el-menu>
 
