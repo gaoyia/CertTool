@@ -43,14 +43,14 @@
         </el-button>
       </div>
 
-      <el-table
-        v-loading="loading"
-        :data="filterText ? filteredCertificates : certificates"
-        style="width: 100%"
-        border
-        stripe
-        height="calc(100vh - 200px)"
-      >
+      <div class="table-container">
+        <el-table
+          v-loading="loading"
+          :data="filterText ? filteredCertificates : certificates"
+          style="width: 100%"
+          border
+          stripe
+        >
         <el-table-column label="主题" min-width="220">
           <template #default="scope">
             <div v-if="scope.row.parsedSubject">
@@ -110,6 +110,11 @@
         </el-table-column>
       </el-table>
 
+        <div v-if="!loading && certificates?.length === 0" class="empty-container">
+          <el-empty description="暂无证书数据" />
+        </div>
+      </div>
+
       <div v-if="certificates.length > 0" class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
@@ -121,8 +126,6 @@
           @current-change="handleCurrentChange"
         />
       </div>
-
-      <el-empty v-if="!loading && certificates?.length === 0" description="暂无证书数据" />
     </el-card>
   </div>
 </template>
@@ -217,14 +220,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.home {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .certificate-card {
-  margin-bottom: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
 }
 
 .card-header {
@@ -237,6 +250,12 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 
+.table-container {
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+}
+
 .pagination-container {
   margin-top: 20px;
   display: flex;
@@ -247,5 +266,25 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px; /* 控制选择框和按钮之间的间距 */
+}
+
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* 深度选择器，确保能够修改 Element Plus 组件内部样式 */
+:deep(.el-card__body) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+
+:deep(.el-table) {
+  height: 100% !important;
 }
 </style>
