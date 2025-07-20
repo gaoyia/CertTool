@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*' # 触发标签格式为 v1.0.0 这样的版本号
 
+permissions:
+  contents: write # 添加写入仓库内容的权限，用于创建Release和上传资源
+
 jobs:
   build:
     runs-on: windows-latest
