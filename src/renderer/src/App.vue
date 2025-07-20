@@ -1,5 +1,19 @@
 <script setup lang="ts">
 import { Star } from '@element-plus/icons-vue'
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+const route = useRoute()
+
+// 根据当前路由路径计算激活的菜单项
+const activeMenu = computed(() => {
+  // 如果是首页或证书管理页，激活"/"菜单
+  if (route.path === '/' || route.path === '/cert-managerment') {
+    return '/'
+  }
+  // 否则返回当前路径作为激活菜单的index
+  return route.path
+})
 </script>
 
 <template>
@@ -9,8 +23,8 @@ import { Star } from '@element-plus/icons-vue'
         赛博要饭
       </el-button>
     </div>
-    <el-menu mode="horizontal" router>
-      <el-menu-item index="/">证书管理</el-menu-item>
+    <el-menu mode="horizontal" router :default-active="activeMenu">
+      <el-menu-item index="/cert-managerment">证书管理</el-menu-item>
       <el-menu-item index="/cert">创建证书</el-menu-item>
       <el-menu-item index="/hosts">hosts编辑</el-menu-item>
     </el-menu>

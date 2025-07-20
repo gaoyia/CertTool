@@ -51,64 +51,64 @@
           border
           stripe
         >
-        <el-table-column label="主题" min-width="220">
-          <template #default="scope">
-            <div v-if="scope.row.parsedSubject">
-              <p v-if="scope.row.parsedSubject.commonName">
-                <strong>CN:</strong> {{ scope.row.parsedSubject.commonName }}
-              </p>
-              <p v-if="scope.row.parsedSubject.organization">
-                <strong>O:</strong> {{ scope.row.parsedSubject.organization }}
-              </p>
-              <p v-if="scope.row.parsedSubject.organizationUnit">
-                <strong>OU:</strong> {{ scope.row.parsedSubject.organizationUnit }}
-              </p>
-              <p v-if="scope.row.parsedSubject.country">
-                <strong>C:</strong> {{ scope.row.parsedSubject.country }}
-              </p>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="颁发者" min-width="220">
-          <template #default="scope">
-            <div v-if="scope.row.parsedIssuer">
-              <p v-if="scope.row.parsedIssuer.commonName">
-                <strong>CN:</strong> {{ scope.row.parsedIssuer.commonName }}
-              </p>
-              <p v-if="scope.row.parsedIssuer.organization">
-                <strong>O:</strong> {{ scope.row.parsedIssuer.organization }}
-              </p>
-              <p v-if="scope.row.parsedIssuer.organizationUnit">
-                <strong>OU:</strong> {{ scope.row.parsedIssuer.organizationUnit }}
-              </p>
-              <p v-if="scope.row.parsedIssuer.country">
-                <strong>C:</strong> {{ scope.row.parsedIssuer.country }}
-              </p>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="指纹与序列号" min-width="220">
-          <template #default="scope">
-            <div>
-              <p><strong>指纹:</strong> {{ scope.row.thumbprint }}</p>
-              <p><strong>序列号:</strong> {{ scope.row.serialNumber }}</p>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="有效期" min-width="180">
-          <template #default="scope">
-            <div>
-              <p><strong>起始时间:</strong> {{ formatDate(scope.row.notBefore) }}</p>
-              <p><strong>截止时间:</strong> {{ formatDate(scope.row.notAfter) }}</p>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" min-width="120">
-          <template #default="scope">
-            <el-button type="danger" @click="deleteCertificate(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          <el-table-column label="主题" min-width="220">
+            <template #default="scope">
+              <div v-if="scope.row.parsedSubject">
+                <p v-if="scope.row.parsedSubject.commonName">
+                  <strong>CN:</strong> {{ scope.row.parsedSubject.commonName }}
+                </p>
+                <p v-if="scope.row.parsedSubject.organization">
+                  <strong>O:</strong> {{ scope.row.parsedSubject.organization }}
+                </p>
+                <p v-if="scope.row.parsedSubject.organizationUnit">
+                  <strong>OU:</strong> {{ scope.row.parsedSubject.organizationUnit }}
+                </p>
+                <p v-if="scope.row.parsedSubject.country">
+                  <strong>C:</strong> {{ scope.row.parsedSubject.country }}
+                </p>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="颁发者" min-width="220">
+            <template #default="scope">
+              <div v-if="scope.row.parsedIssuer">
+                <p v-if="scope.row.parsedIssuer.commonName">
+                  <strong>CN:</strong> {{ scope.row.parsedIssuer.commonName }}
+                </p>
+                <p v-if="scope.row.parsedIssuer.organization">
+                  <strong>O:</strong> {{ scope.row.parsedIssuer.organization }}
+                </p>
+                <p v-if="scope.row.parsedIssuer.organizationUnit">
+                  <strong>OU:</strong> {{ scope.row.parsedIssuer.organizationUnit }}
+                </p>
+                <p v-if="scope.row.parsedIssuer.country">
+                  <strong>C:</strong> {{ scope.row.parsedIssuer.country }}
+                </p>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="指纹与序列号" min-width="220">
+            <template #default="scope">
+              <div>
+                <p><strong>指纹:</strong> {{ scope.row.thumbprint }}</p>
+                <p><strong>序列号:</strong> {{ scope.row.serialNumber }}</p>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="有效期" min-width="180">
+            <template #default="scope">
+              <div>
+                <p><strong>起始时间:</strong> {{ formatDate(scope.row.notBefore) }}</p>
+                <p><strong>截止时间:</strong> {{ formatDate(scope.row.notAfter) }}</p>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" min-width="120">
+            <template #default="scope">
+              <el-button type="danger" @click="deleteCertificate(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
 
         <div v-if="!loading && certificates?.length === 0" class="empty-container">
           <el-empty description="暂无证书数据" />

@@ -67,7 +67,7 @@
     />
 
     <!-- 创建证书对话框 -->
-    <el-dialog v-model="createDialogVisible" title="创建证书" width="60%">
+    <el-dialog v-model="createDialogVisible" top="3vh" title="创建证书" width="60%">
       <el-form ref="certFormRef" :model="certForm" label-width="120px" :rules="rules">
         <el-form-item label="通用名称" prop="commonName">
           <el-input v-model="certForm.commonName" placeholder="请输入域名或IP地址" />

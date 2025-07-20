@@ -1,15 +1,25 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
+let indexPath = localStorage.getItem('index') || '/cert-managerment'
+const list = ['/cert-managerment', '/cert', '/hosts']
+if (!list.includes(indexPath)) {
+  indexPath = '/cert-managerment'
+}
+
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@renderer/views/HomeView.vue')
+    redirect: indexPath
+  },
+  {
+    path: '/cert-managerment',
+    name: 'cert-managerment',
+    component: () => import('@renderer/views/CertManagermentView.vue')
   },
   {
     path: '/donate',
     name: 'donate',
-    // 路由懒加载
     component: () => import('@renderer/views/DonateView.vue')
   },
   {
@@ -21,6 +31,10 @@ const routes = [
     path: '/hosts',
     name: 'hosts',
     component: () => import('@renderer/views/HostsView.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: indexPath
   }
 ]
 
