@@ -7,10 +7,10 @@ const routes = [
     component: () => import('@renderer/views/HomeView.vue')
   },
   {
-    path: '/about',
-    name: 'about',
+    path: '/donate',
+    name: 'donate',
     // 路由懒加载
-    component: () => import('@renderer/views/AboutView.vue')
+    component: () => import('@renderer/views/DonateView.vue')
   },
   {
     path: '/cert',

@@ -16,14 +16,14 @@ ipcMain.handle(
     // 设置默认值
     const {
       commonName,
-      country = 'CN',
-      state = 'Beijing',
-      locality = 'Beijing',
-      organization = 'My Company',
-      organizationUnit = 'Dev',
-      altNames = ['localhost', '127.0.0.1'],
-      validityDays = 365,
-      keySize = 2048
+      country,
+      state,
+      locality,
+      organization,
+      organizationUnit,
+      altNames = [],
+      validityDays,
+      keySize
     } = certInfo
 
     // 生成密钥对
@@ -275,23 +275,32 @@ ipcMain.handle(
     force: boolean = false
   ) => {
     return new Promise((resolve, reject) => {
-      let command = `powershell.exe -ExecutionPolicy Bypass -File "${RemoveCertificateTrust}" -Thumbprint "${thumbprint}" -StoreLocation ${storeLocation} -StoreName ${storeName}`
+      // 构建PowerShell命令参数
+      let psArgs = `-NoLogo -NoProfile -ExecutionPolicy Bypass -File "${RemoveCertificateTrust}" -Thumbprint "${thumbprint}" -StoreLocation ${storeLocation} -StoreName ${storeName}`
 
       if (force) {
-        command += ' -Force'
+        psArgs += ' -Force'
       }
 
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`执行错误: ${error}`)
-          reject(new Error(`执行错误: ${error.message}`))
-          return
-        }
-        if (stderr) {
-          console.error(`PowerShell 错误: ${stderr}`)
-        }
-        resolve(stdout)
+      // 关键：通过 Start-Process 触发 UAC
+      const psScript = `Start-Process powershell.exe \
+    -ArgumentList '${psArgs}' \
+    ${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
+    -Wait \
+    -WindowStyle Hidden` // ← 关键：隐藏第二个窗口
+      const psProcess = spawn('powershell.exe', ['-Command', psScript], { stdio: 'pipe' })
+
+      let stdout = '',
+        stderr = ''
+      psProcess.stdout.on('data', (data) => (stdout += data))
+      psProcess.stderr.on('data', (data) => (stderr += data))
+
+      psProcess.on('close', (code) => {
+        if (code !== 0) reject(new Error(stderr || `退出码 ${code}`))
+        else resolve(stdout)
       })
+
+      psProcess.on('error', reject)
     })
   }
 )

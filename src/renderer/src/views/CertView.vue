@@ -38,14 +38,21 @@
               >查看详情</el-button
             >
             <br />
-            <el-button
+            <el-dropdown
+              split-button
               type="success"
               size="small"
-              :loading="trusting"
-              @click="trustCertificate(row)"
+              @click="trustCertificate(row, 'CurrentUser')"
             >
-              一键信任
-            </el-button>
+              一键信任（用户）
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="trustCertificate(row, 'LocalMachine')"
+                    >一键信任（计算机）</el-dropdown-item
+                  >
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -151,7 +158,10 @@ import { deleteFile, saveFile } from '@renderer/api'
 
 // 一键信任证书
 const trusting = ref(false)
-const trustCertificate = async (cert: CreateCertResult) => {
+const trustCertificate = async (
+  cert: CreateCertResult,
+  storeLocation: 'CurrentUser' | 'LocalMachine' = 'CurrentUser'
+) => {
   trusting.value = true
   try {
     // 首先检查证书是否已信任
@@ -170,7 +180,7 @@ const trustCertificate = async (cert: CreateCertResult) => {
     await saveFile(certFilePath, cert.pem.certificate)
 
     // 导入证书到信任存储
-    await importCertificateTrust(certFilePath, 'CurrentUser', 'Root')
+    await importCertificateTrust(certFilePath, storeLocation, 'Root')
 
     // 删除临时文件
     await deleteFile(certFilePath)
@@ -213,7 +223,7 @@ const defaultCertForm = {
   locality: 'Beijing',
   organization: 'Cert-Tool',
   organizationUnit: 'Cert-Tool',
-  altNames: ['localhost', '127.0.0.1'],
+  altNames: ['localhost'],
   validityDays: 365,
   keySize: 2048
 }
