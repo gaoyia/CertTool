@@ -182,13 +182,13 @@ ipcMain.handle(
     return new Promise((resolve, reject) => {
       // 关键：通过 Start-Process 触发 UAC
       const psScript = `Start-Process powershell.exe \
-    -ArgumentList '-NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ImportCertificateTrust}" \
-                   -FilePath "${filePath}" \
-                   -StoreLocation ${storeLocation} \
-                   -StoreName ${storeName}' \
-    ${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
-    -Wait \
-    -WindowStyle Hidden` // ← 关键：隐藏第二个窗口
+-ArgumentList '-NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ImportCertificateTrust}" \
+-FilePath "${filePath}" \
+-StoreLocation ${storeLocation} \
+-StoreName ${storeName}' \
+${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
+-WindowStyle Hidden \
+-Wait`
       const psProcess = spawn('powershell.exe', ['-Command', psScript], { stdio: 'pipe' })
 
       let stdout = '',
@@ -284,10 +284,10 @@ ipcMain.handle(
 
       // 关键：通过 Start-Process 触发 UAC
       const psScript = `Start-Process powershell.exe \
-    -ArgumentList '${psArgs}' \
-    ${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
-    -Wait \
-    -WindowStyle Hidden` // ← 关键：隐藏第二个窗口
+      -ArgumentList '${psArgs}' \
+      ${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
+      -WindowStyle Hidden \
+      -Wait`
       const psProcess = spawn('powershell.exe', ['-Command', psScript], { stdio: 'pipe' })
 
       let stdout = '',

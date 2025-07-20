@@ -3,9 +3,10 @@ import { writeFile, readFile, deleteFile, fileExists } from '../../utility/file'
 import path from 'path'
 import os from 'os'
 import { app } from 'electron'
-import { exec, spawn } from 'child_process'
+import { exec } from 'child_process'
 import { promisify } from 'util'
 import { v4 as uuidv4 } from 'uuid'
+import { execSync } from 'child_process'
 
 // 将exec转换为Promise版本
 const execPromise = promisify(exec)
@@ -50,21 +51,13 @@ Copy-Item -Path $sourcePath -Destination $destPath -Force
 
           const base64 = Buffer.from(psCommand, 'utf16le').toString('base64')
 
-          await new Promise<void>((resolve, reject) => {
-            const child = spawn(
-              'powershell',
-              [
-                '-NoProfile',
-                '-Command',
-                `Start-Process powershell -Verb RunAs -WindowStyle Hidden -ArgumentList '-NoProfile','-EncodedCommand','${base64}' -Wait`
-              ],
-              { stdio: 'inherit' }
-            )
-
-            child.on('close', (code) =>
-              code === 0 ? resolve() : reject(new Error(`复制失败 code=${code}`))
-            )
-          })
+          execSync(
+            `powershell -NoProfile -Command "Start-Process powershell -Verb RunAs -WindowStyle Hidden -ArgumentList '-NoProfile','-EncodedCommand','${base64}' -Wait"`,
+            {
+              windowsHide: true, // 关键：隐藏窗口
+              stdio: 'pipe' // 避免继承主进程控制台
+            }
+          )
 
           // 到这里提权进程已结束，可以安全删临时文件
           await deleteFile(tempFilePath)
