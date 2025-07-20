@@ -153,7 +153,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { ArrowDown, DocumentCopy, Download } from '@element-plus/icons-vue'
+import { Download } from '@element-plus/icons-vue'
 import { CreateCertResult } from '@dto/certificate'
 import { openDirectoryDialog, saveFileDialog } from '@renderer/api/dialog'
 import { saveFile } from '@renderer/api/file'
