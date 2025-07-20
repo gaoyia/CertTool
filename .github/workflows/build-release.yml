@@ -35,6 +35,16 @@ jobs:
         with:
           version: 10 # 可根据项目需要调整pnpm版本
 
+      - name: Remove .npmrc file
+        run: |
+          if (Test-Path .npmrc) {
+            Remove-Item -Path .npmrc -Force
+            Write-Host ".npmrc file removed"
+          } else {
+            Write-Host ".npmrc file does not exist"
+          }
+        shell: pwsh
+
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
