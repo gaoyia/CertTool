@@ -52,11 +52,9 @@ jobs:
       - name: Build application
         run: pnpm build:win
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
         with:
-          files: dist/cert-tool-*-setup.exe
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: windows-installer
+          path: dist/cert-tool-*-setup.exe
+          retention-days: 30
