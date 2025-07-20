@@ -1,6 +1,6 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import forge from 'node-forge'
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import GetTrustedRootCertificates from '../../../../resources/Get-TrustedRootCertificates.ps1?asset&asarUnpack'
 import ImportCertificateTrust from '../../../../resources/Import-CertificateTrust.ps1?asset&asarUnpack'
 import CheckCertificateTrust from '../../../../resources/Check-CertificateTrust.ps1?asset&asarUnpack'
@@ -178,27 +178,30 @@ ipcMain.handle(
 // 导入证书到信任存储处理程序
 ipcMain.handle(
   'Import-CertificateTrust',
-  async (
-    _event: IpcMainInvokeEvent,
-    filePath: string,
-    storeLocation: 'LocalMachine' | 'CurrentUser' = 'LocalMachine',
-    storeName: 'Root' | 'CA' = 'Root'
-  ) => {
+  async (_event, filePath, storeLocation = 'LocalMachine', storeName = 'Root') => {
     return new Promise((resolve, reject) => {
-      exec(
-        `powershell.exe -ExecutionPolicy Bypass -File "${ImportCertificateTrust}" -FilePath "${filePath}" -StoreLocation ${storeLocation} -StoreName ${storeName}`,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error(`执行错误: ${error}`)
-            reject(new Error(`执行错误: ${error.message}`))
-            return
-          }
-          if (stderr) {
-            console.error(`PowerShell 错误: ${stderr}`)
-          }
-          resolve(stdout)
-        }
-      )
+      // 关键：通过 Start-Process 触发 UAC
+      const psScript = `Start-Process powershell.exe \
+    -ArgumentList '-NoLogo -NoProfile -ExecutionPolicy Bypass -File "${ImportCertificateTrust}" \
+                   -FilePath "${filePath}" \
+                   -StoreLocation ${storeLocation} \
+                   -StoreName ${storeName}' \
+    ${storeLocation === 'LocalMachine' ? '-Verb RunAs' : ''} \
+    -Wait \
+    -WindowStyle Hidden` // ← 关键：隐藏第二个窗口
+      const psProcess = spawn('powershell.exe', ['-Command', psScript], { stdio: 'pipe' })
+
+      let stdout = '',
+        stderr = ''
+      psProcess.stdout.on('data', (data) => (stdout += data))
+      psProcess.stderr.on('data', (data) => (stderr += data))
+
+      psProcess.on('close', (code) => {
+        if (code !== 0) reject(new Error(stderr || `退出码 ${code}`))
+        else resolve(stdout)
+      })
+
+      psProcess.on('error', reject)
     })
   }
 )

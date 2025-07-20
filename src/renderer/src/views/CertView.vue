@@ -170,7 +170,7 @@ const trustCertificate = async (cert: CreateCertResult) => {
     await saveFile(certFilePath, cert.pem.certificate)
 
     // 导入证书到信任存储
-    await importCertificateTrust(certFilePath, 'LocalMachine', 'Root')
+    await importCertificateTrust(certFilePath, 'CurrentUser', 'Root')
 
     // 删除临时文件
     await deleteFile(certFilePath)

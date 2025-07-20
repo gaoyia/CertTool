@@ -73,19 +73,19 @@ ipcMain.handle('getPath', (_event: IpcMainInvokeEvent, name: GetPathParams): str
 ipcMain.handle(
   'read-file-with-powershell',
   async (_event: IpcMainInvokeEvent, filePath: string): Promise<string> => {
-    console.log(`使用PowerShell读取文件: ${filePath}`);
+    console.log(`使用PowerShell读取文件: ${filePath}`)
 
-      // 使用PowerShell读取文件
-      const { stdout, stderr } = await execPromise(
-        `powershell -Command "Get-Content -Path '${filePath}' -Raw"`
-      )
-      console.log(stderr);
+    // 使用PowerShell读取文件
+    const { stdout, stderr } = await execPromise(
+      `powershell -Command "Get-Content -Path '${filePath}' -Raw"`
+    )
+    console.log(stderr)
 
-      if (stderr) {
-        throw new Error(`PowerShell错误: ${stderr}`)
-      }
-      console.log(stdout);
+    if (stderr) {
+      throw new Error(`PowerShell错误: ${stderr}`)
+    }
+    console.log(stdout)
 
-      return stdout
+    return stdout
   }
 )

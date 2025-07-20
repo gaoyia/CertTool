@@ -352,7 +352,9 @@ onUnmounted(() => {
   display: flex;
 }
 
-.save-button, .reload-button, .powershell-button {
+.save-button,
+.reload-button,
+.powershell-button {
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
