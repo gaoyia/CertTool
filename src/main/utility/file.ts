@@ -36,7 +36,7 @@ export async function writeFile(
 ) {
   const dir = path.dirname(filePath)
   await fs.mkdir(dir, { recursive: true })
-  return await fs.writeFile(filePath, data, options)
+  return fs.writeFile(filePath, data, options)
 }
 
 /**

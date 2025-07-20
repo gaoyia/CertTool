@@ -1,9 +1,11 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { writeFile, readFile, deleteFile, fileExists } from '../../utility/file'
 import path from 'path'
+import os from 'os'
 import { app } from 'electron'
-import { exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import { promisify } from 'util'
+import { v4 as uuidv4 } from 'uuid'
 
 // 将exec转换为Promise版本
 const execPromise = promisify(exec)
@@ -22,7 +24,68 @@ ipcMain.handle(
     content: string,
     options?: object
   ): Promise<void> => {
-    return writeFile(filePath, content, options)
+    try {
+      return await writeFile(filePath, content, options)
+    } catch (error: any) {
+      // 把要写入的内容放到一个临时文件里，避免命令行长度/转义问题
+      if (error.code === 'EPERM') {
+        // 创建临时文件路径
+        const tempFilePath = path.join(os.tmpdir(), `CertTool-${uuidv4()}.tmp`)
+
+        try {
+          // 写入临时文件
+          await writeFile(tempFilePath, content)
+
+          // 使用PowerShell以管理员权限复制文件
+
+          const sourcePath = tempFilePath.replace(/'/g, "''")
+          const destPath = filePath.replace(/'/g, "''")
+
+          const psCommand = `
+$sourcePath = '${sourcePath}'
+$destPath   = '${destPath}'
+if (-not (Test-Path $sourcePath)) { throw "源文件不存在：$sourcePath" }
+Copy-Item -Path $sourcePath -Destination $destPath -Force
+`.trim()
+
+          const base64 = Buffer.from(psCommand, 'utf16le').toString('base64')
+
+          await new Promise<void>((resolve, reject) => {
+            const child = spawn(
+              'powershell',
+              [
+                '-NoProfile',
+                '-Command',
+                `Start-Process powershell -Verb RunAs -WindowStyle Hidden -ArgumentList '-NoProfile','-EncodedCommand','${base64}' -Wait`
+              ],
+              { stdio: 'inherit' }
+            )
+
+            child.on('close', (code) =>
+              code === 0 ? resolve() : reject(new Error(`复制失败 code=${code}`))
+            )
+          })
+
+          // 到这里提权进程已结束，可以安全删临时文件
+          await deleteFile(tempFilePath)
+
+          console.log(3)
+          console.log(`文件已通过提升权限方式保存到: ${filePath}`)
+        } catch (elevatedError: any) {
+          // 清理临时文件
+          try {
+            if (await fileExists(tempFilePath)) {
+              await deleteFile(tempFilePath)
+            }
+          } catch (cleanupError: any) {
+            console.error('清理临时文件失败:', cleanupError)
+          }
+          throw new Error(`${elevatedError.message}`)
+        }
+      } else {
+        throw error
+      }
+    }
   }
 )
 

@@ -15,9 +15,6 @@
         <button @click="reloadHostsFile" :disabled="isLoading" class="reload-button">
           {{ isLoading ? '加载中...' : '重新加载' }}
         </button>
-        <button @click="readWithPowerShell" :disabled="isLoadingPS" class="powershell-button">
-          {{ isLoadingPS ? 'PowerShell加载中...' : '使用PowerShell读取' }}
-        </button>
       </div>
     </div>
 
@@ -64,7 +61,7 @@ import {
 import { lintKeymap } from '@codemirror/lint'
 
 import { onMounted, onUnmounted, Ref, ref } from 'vue'
-import { readHostsFile, saveHostsFile, readHostsFileWithPowerShell } from '../api/file'
+import { readHostsFile, saveHostsFile } from '../api/file'
 
 const editorContainer: Ref<Element | null> = ref<Element | null>(null)
 let view: EditorView | null = null
@@ -110,7 +107,7 @@ const setupResizeListener = () => {
 }
 
 // 读取hosts文件
-const loadHostsFile = async () => {
+const loadHostsFile = async (showTips: boolean = true) => {
   if (!view) return
 
   isLoading.value = true
@@ -123,18 +120,23 @@ const loadHostsFile = async () => {
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: content }
     })
-    successMessage.value = 'Hosts文件加载成功'
+    if (showTips) {
+      successMessage.value = 'Hosts文件加载成功'
+    }
   } catch (error) {
     console.error('读取hosts文件失败:', error)
-    errorMessage.value = `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+    if (showTips) {
+      errorMessage.value = `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+    }
   } finally {
     isLoading.value = false
-
-    // 3秒后清除成功消息
-    if (successMessage.value) {
-      setTimeout(() => {
-        successMessage.value = ''
-      }, 3000)
+    if (showTips) {
+      // 3秒后清除成功消息
+      if (successMessage.value) {
+        setTimeout(() => {
+          successMessage.value = ''
+        }, 3000)
+      }
     }
   }
 }
@@ -157,41 +159,12 @@ const saveHostsFileHandler = async () => {
     const content = view.state.doc.toString()
     await saveHostsFile(content)
     successMessage.value = 'Hosts文件保存成功'
+    await loadHostsFile(false)
   } catch (error) {
     console.error('保存hosts文件失败:', error)
     errorMessage.value = `保存hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
   } finally {
     isSaving.value = false
-
-    // 3秒后清除成功消息
-    if (successMessage.value) {
-      setTimeout(() => {
-        successMessage.value = ''
-      }, 3000)
-    }
-  }
-}
-
-// 使用PowerShell读取hosts文件
-const readWithPowerShell = async () => {
-  if (!view) return
-
-  isLoadingPS.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
-
-  try {
-    const content = await readHostsFileWithPowerShell()
-
-    // 更新编辑器内容
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: content }
-    })
-    successMessage.value = '使用PowerShell成功读取Hosts文件'
-  } catch (error) {
-    errorMessage.value = `使用PowerShell读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
-  } finally {
-    isLoadingPS.value = false
 
     // 3秒后清除成功消息
     if (successMessage.value) {

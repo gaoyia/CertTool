@@ -76,11 +76,3 @@ export const readHostsFile = async (): Promise<string> => {
 export const saveHostsFile = async (content: string): Promise<void> => {
   return await window.electron.ipcRenderer.invoke('save-file', hostsPath, content)
 }
-
-/**
- * 使用PowerShell读取hosts文件
- * @returns hosts文件内容
- */
-export const readHostsFileWithPowerShell = async (): Promise<string> => {
-  return await window.electron.ipcRenderer.invoke('read-file-with-powershell', hostsPath)
-}
