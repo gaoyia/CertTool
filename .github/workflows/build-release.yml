@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # 触发标签格式为 v1.0.0 这样的版本号
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22 # 可根据项目需要调整Node.js版本
+
+      - name: Verify version
+        run: |
+          $TAG_VERSION = "${{ github.ref_name }}".Substring(1) # 移除v前缀
+          $PKG_VERSION = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
+          if ($TAG_VERSION -ne $PKG_VERSION) {
+            Write-Error "Version mismatch: Tag version ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10 # 可根据项目需要调整pnpm版本
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build application
+        run: pnpm build:win
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/cert-tool-*-setup.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
