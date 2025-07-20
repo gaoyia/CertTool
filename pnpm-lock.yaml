@@ -17,6 +17,9 @@ importers:
       '@codemirror/lang-cpp':
         specifier: ^6.0.3
         version: 6.0.3
+      '@codemirror/language':
+        specifier: ^6.11.2
+        version: 6.11.2
       '@codemirror/lint':
         specifier: ^6.8.5
         version: 6.8.5
