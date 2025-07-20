@@ -61,3 +61,12 @@ jobs:
           retention-days: 30
           compression-level: 0
           overwrite: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/cert-tool-*-setup.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
