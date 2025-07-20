@@ -2,6 +2,11 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import { writeFile, readFile, deleteFile, fileExists } from '../../utility/file'
 import path from 'path'
 import { app } from 'electron'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+
+// 将exec转换为Promise版本
+const execPromise = promisify(exec)
 
 // 获取应用数据目录
 const getAppDataPath = (): string => {
@@ -63,3 +68,24 @@ type GetPathParams = Parameters<typeof app.getPath>[0]
 ipcMain.handle('getPath', (_event: IpcMainInvokeEvent, name: GetPathParams): string => {
   return app.getPath(name)
 })
+
+// 使用PowerShell读取文件
+ipcMain.handle(
+  'read-file-with-powershell',
+  async (_event: IpcMainInvokeEvent, filePath: string): Promise<string> => {
+    console.log(`使用PowerShell读取文件: ${filePath}`);
+
+      // 使用PowerShell读取文件
+      const { stdout, stderr } = await execPromise(
+        `powershell -Command "Get-Content -Path '${filePath}' -Raw"`
+      )
+      console.log(stderr);
+
+      if (stderr) {
+        throw new Error(`PowerShell错误: ${stderr}`)
+      }
+      console.log(stdout);
+
+      return stdout
+  }
+)

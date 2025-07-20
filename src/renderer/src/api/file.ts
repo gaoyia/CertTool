@@ -1,3 +1,6 @@
+const hostsPath = 'C:\\Windows\\System32\\drivers\\etc\\hosts'
+// ?
+// : '/etc/hosts'
 /**
  * 保存文件到应用数据目录
  * @param filePath 文件名
@@ -46,4 +49,38 @@ export const deleteFile = async (fileName: string): Promise<void> => {
  */
 export const getAppDataPath = async (): Promise<string> => {
   return await window.electron.ipcRenderer.invoke('get-app-data-path')
+}
+
+/**
+ * 获取系统路径
+ * @param name 路径名称
+ * @returns 系统路径
+ */
+export const getPath = async (name: string): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke('getPath', name)
+}
+
+/**
+ * 读取hosts文件
+ * @returns hosts文件内容
+ */
+export const readHostsFile = async (): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke('read-file', hostsPath)
+}
+
+/**
+ * 保存hosts文件
+ * @param content hosts文件内容
+ * @returns 保存结果
+ */
+export const saveHostsFile = async (content: string): Promise<void> => {
+  return await window.electron.ipcRenderer.invoke('save-file', hostsPath, content)
+}
+
+/**
+ * 使用PowerShell读取hosts文件
+ * @returns hosts文件内容
+ */
+export const readHostsFileWithPowerShell = async (): Promise<string> => {
+  return await window.electron.ipcRenderer.invoke('read-file-with-powershell', hostsPath)
 }

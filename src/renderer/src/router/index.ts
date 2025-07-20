@@ -16,6 +16,11 @@ const routes = [
     path: '/cert',
     name: 'cert',
     component: () => import('@renderer/views/CertView.vue')
+  },
+  {
+    path: '/hosts',
+    name: 'hosts',
+    component: () => import('@renderer/views/HostsView.vue')
   }
 ]
 
