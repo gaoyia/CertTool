@@ -35,6 +35,9 @@ importers:
       '@electron-toolkit/utils':
         specifier: ^4.0.0
         version: 4.0.0(electron@35.7.2)
+      '@element-plus/icons-vue':
+        specifier: ^2.3.1
+        version: 2.3.1(vue@3.5.17(typescript@5.8.3))
       electron-updater:
         specifier: ^6.3.9
         version: 6.6.2
