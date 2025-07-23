@@ -298,19 +298,25 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   position: relative;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .editor-container {
   flex-grow: 1;
   overflow: hidden;
   position: relative;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  margin: 1.5rem;
 }
 
 /* 确保CodeMirror编辑器填满容器 */
 .editor-container :deep(.cm-editor) {
   height: 100%;
+  border-radius: 0.5rem;
 }
 
 /* 确保CodeMirror内容区域可以滚动 */
@@ -318,87 +324,182 @@ onUnmounted(() => {
   overflow: auto;
 }
 
+/* CodeMirror主题样式 */
+.editor-container :deep(.cm-focused) {
+  outline: none;
+}
+
+.editor-container :deep(.cm-activeLine) {
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.editor-container :deep(.cm-activeLineGutter) {
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.editor-container :deep(.cm-gutters) {
+  background-color: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.editor-container :deep(.cm-lineNumbers) {
+  font-size: 0.875rem;
+}
+
+.editor-container :deep(.cm-content) {
+  font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
 .hosts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.hosts-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hosts-header h1::before {
+  content: '';
+  width: 3px;
+  height: 1.5rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-radius: 2px;
 }
 
 .actions {
   display: flex;
+  gap: 0.75rem;
 }
 
 .save-button,
 .reload-button,
 .powershell-button {
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 14px;
-  margin-left: 10px;
-  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .save-button {
-  background-color: #4caf50;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
 }
 
-.save-button:hover {
-  background-color: #45a049;
+.save-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .save-button:disabled {
-  background-color: #a5d6a7;
+  background: #a5d6a7;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .reload-button {
-  background-color: #2196f3;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
 }
 
-.reload-button:hover {
-  background-color: #0b7dda;
+.reload-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .reload-button:disabled {
-  background-color: #90caf9;
+  background: #90caf9;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .powershell-button {
-  background-color: #5c2d91;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: white;
 }
 
-.powershell-button:hover {
-  background-color: #4a2276;
+.powershell-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
 }
 
 .powershell-button:disabled {
-  background-color: #9d8bb0;
+  background: #9d8bb0;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .error-message {
-  color: #f44336;
-  padding: 8px;
-  background-color: #ffebee;
-  border-radius: 4px;
+  color: #ef4444;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 0.5rem;
   position: absolute;
   box-sizing: border-box;
-  width: 100%;
-  top: -15px;
+  width: calc(100% - 3rem);
+  top: 1rem;
+  left: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .success-message {
-  color: #4caf50;
-  padding: 8px;
-  background-color: #e8f5e9;
-  border-radius: 4px;
+  color: #10b981;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 0.5rem;
   position: absolute;
   box-sizing: border-box;
-  width: 100%;
-  top: -15px;
+  width: calc(100% - 3rem);
+  top: 1rem;
+  left: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 加载状态 */
+:deep(.el-loading-mask) {
+  border-radius: 0.5rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hosts-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .actions {
+    justify-content: space-between;
+  }
+
+  .editor-container {
+    margin: 1rem;
+  }
+
+  .error-message,
+  .success-message {
+    width: calc(100% - 2rem);
+    left: 1rem;
+  }
 }
 </style>

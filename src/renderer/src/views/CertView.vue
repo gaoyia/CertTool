@@ -323,38 +323,181 @@ const removeAltName = (index: number) => {
 </script>
 
 <style scoped>
-.cert-list {
-  margin-bottom: 20px;
+.cert {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.cert h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cert h1::before {
+  content: '';
+  width: 4px;
+  height: 2rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-radius: 2px;
+}
+
+.cert > p {
+  color: #ef4444;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 0.5rem;
+  border-left: 4px solid #ef4444;
 }
 
 .action {
-  margin-top: 20px;
+  margin: 2rem 0;
 }
 
-.empty-state {
-  margin: 40px 0;
+.action .el-button {
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
+.cert-info-container {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cert-info-container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cert-info-container h2::before {
+  content: '';
+  width: 3px;
+  height: 1.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 2px;
+}
+
+.cert-info-container .el-table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.cert-info-container .el-table td {
+  padding: 1rem;
+}
+
+.cert-info-container .el-table p {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.cert-info-container .el-table strong {
+  color: #1e293b;
+}
+
+.cert-info-container .el-button {
+  margin: 0.25rem;
+  border-radius: 0.375rem;
+}
+
+/* 创建证书对话框样式 */
+:deep(.el-dialog) {
+  border-radius: 0.75rem;
+}
+
+:deep(.el-dialog__header) {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+:deep(.el-dialog__title) {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+:deep(.el-dialog__body) {
+  padding: 1.5rem;
+}
+
+:deep(.el-form-item__label) {
+  font-weight: 600;
+  color: #374151;
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 0.5rem;
+}
+
+:deep(.el-select .el-input__wrapper) {
+  border-radius: 0.5rem;
+}
+
+:deep(.el-input-number) {
+  border-radius: 0.5rem;
+}
+
+:deep(fieldset) {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+:deep(legend) {
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* 标签输入样式 */
 .input-new-tag {
   width: 200px;
   margin-right: 10px;
   vertical-align: bottom;
+  border-radius: 0.5rem;
 }
 
-.copy-action {
-  margin-top: 10px;
-  text-align: right;
+:deep(.el-tag) {
+  margin: 0.25rem;
+  border-radius: 0.375rem;
 }
 
-.cert-info-container {
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
+/* 空状态样式 */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
 }
 
-/* 在style部分添加以下样式 */
-.el-table .el-button {
-  margin: 2px 0;
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .cert {
+    padding: 1rem;
+  }
+
+  .cert-info-container {
+    padding: 1rem;
+  }
+
+  .cert-info-container .el-table {
+    font-size: 0.875rem;
+  }
 }
 </style>
