@@ -1,11 +1,5 @@
 <template>
   <div class="hosts-view">
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-    <div v-if="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
     <div class="hosts-header">
       <h1>Hosts 文件编辑器</h1>
       <div class="actions">
@@ -61,6 +55,7 @@ import {
 import { lintKeymap } from '@codemirror/lint'
 
 import { onMounted, onUnmounted, Ref, ref } from 'vue'
+import { ElNotification } from 'element-plus'
 import { readHostsFile, saveHostsFile } from '../api/file'
 
 const editorContainer: Ref<Element | null> = ref<Element | null>(null)
@@ -72,8 +67,6 @@ let resizeTimeout: number | null = null
 const isLoading = ref(false)
 const isSaving = ref(false)
 const isLoadingPS = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
 
 // 调整编辑器高度的函数
 const adjustEditorHeight = () => {
@@ -111,8 +104,6 @@ const loadHostsFile = async (showTips: boolean = true) => {
   if (!view) return
 
   isLoading.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
 
   try {
     const content = await readHostsFile()
@@ -121,23 +112,27 @@ const loadHostsFile = async (showTips: boolean = true) => {
       changes: { from: 0, to: view.state.doc.length, insert: content }
     })
     if (showTips) {
-      successMessage.value = 'Hosts文件加载成功'
+      ElNotification({
+        title: '成功',
+        message: 'Hosts文件加载成功',
+        type: 'success',
+        position: 'top-left',
+        duration: 3000
+      })
     }
   } catch (error) {
     console.error('读取hosts文件失败:', error)
     if (showTips) {
-      errorMessage.value = `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+      ElNotification({
+        title: '错误',
+        message: `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`,
+        position: 'top-left',
+        type: 'error',
+        duration: 5000
+      })
     }
   } finally {
     isLoading.value = false
-    if (showTips) {
-      // 3秒后清除成功消息
-      if (successMessage.value) {
-        setTimeout(() => {
-          successMessage.value = ''
-        }, 3000)
-      }
-    }
   }
 }
 
@@ -152,37 +147,46 @@ const saveHostsFileHandler = async () => {
   if (isLoading.value || isSaving.value) return
 
   isSaving.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
 
   try {
     const content = view.state.doc.toString()
     await saveHostsFile(content)
-    successMessage.value = 'Hosts文件保存成功'
+    ElNotification({
+      title: '成功',
+      message: 'Hosts文件保存成功',
+      position: 'top-left',
+      type: 'success',
+      duration: 3000
+    })
     await loadHostsFile(false)
   } catch (error) {
     console.error('保存hosts文件失败:', error)
-    errorMessage.value = `保存hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+    ElNotification({
+      title: '错误',
+      message: `保存hosts文件失败: ${error instanceof Error ? error.message : String(error)}`,
+      position: 'top-left',
+      type: 'error',
+      duration: 5000
+    })
   } finally {
     isSaving.value = false
-
-    // 3秒后清除成功消息
-    if (successMessage.value) {
-      setTimeout(() => {
-        successMessage.value = ''
-      }, 3000)
-    }
   }
 }
 
 onMounted(async () => {
   if (editorContainer.value) {
-    let content
+    let content = ''
     try {
       content = await readHostsFile()
     } catch (error) {
       console.error('读取hosts文件失败:', error)
-      errorMessage.value = `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+      ElNotification({
+        title: '错误',
+        message: `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`,
+        position: 'top-left',
+        type: 'error',
+        duration: 5000
+      })
     }
     view = new EditorView({
       doc: content,
@@ -432,36 +436,6 @@ onUnmounted(() => {
   opacity: 0.7;
 }
 
-.error-message {
-  color: #ef4444;
-  padding: 0.75rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 0.375rem;
-  position: absolute;
-  box-sizing: border-box;
-  width: calc(100% - 2rem);
-  top: 0.75rem;
-  left: 1rem;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.success-message {
-  color: #10b981;
-  padding: 0.75rem;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 0.375rem;
-  position: absolute;
-  box-sizing: border-box;
-  width: calc(100% - 2rem);
-  top: 0.75rem;
-  left: 1rem;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 /* 紧凑加载状态 */
 :deep(.el-loading-mask) {
   border-radius: 0.375rem;
@@ -481,12 +455,6 @@ onUnmounted(() => {
 
   .editor-container {
     margin: 0.75rem;
-  }
-
-  .error-message,
-  .success-message {
-    width: calc(100% - 1.5rem);
-    left: 0.75rem;
   }
 }
 </style>
