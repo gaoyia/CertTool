@@ -20,8 +20,8 @@
             class="location-select"
             @change="fetchCertificates"
           >
+          <el-option label="当前用户" value="CurrentUser" />
             <el-option label="本地计算机" value="LocalMachine" />
-            <el-option label="当前用户" value="CurrentUser" />
           </el-select>
 
           <el-button
@@ -296,7 +296,7 @@ const statusFilter = ref('')
 // 加载状态
 const loading = ref(false)
 // 证书存储位置
-const location = ref<'LocalMachine' | 'CurrentUser'>('LocalMachine')
+const location = ref<'LocalMachine' | 'CurrentUser'>('CurrentUser')
 // 分页相关
 const currentPage = ref(1)
 const pageSize = ref(20)
