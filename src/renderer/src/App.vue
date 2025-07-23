@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { Star, Setting, Document, Plus, Edit } from '@element-plus/icons-vue'
+import { ElConfigProvider } from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 
 const route = useRoute()
+
+// Element Plus 中文语言配置
+const locale = zhCn
 
 // 根据当前路由路径计算激活的菜单项
 const activeMenu = computed(() => {
@@ -34,57 +39,59 @@ const menuItems = [
 </script>
 
 <template>
-  <div class="app-container">
-    <!-- 简洁顶部导航栏 -->
-    <header class="app-header">
-      <div class="nav-container">
-        <div class="brand">
-          <el-icon size="20" color="#2563eb">
-            <Setting />
-          </el-icon>
-          <span>CertTool</span>
-        </div>
-
-        <nav class="nav-menu">
-          <router-link
-            v-for="item in menuItems"
-            :key="item.index"
-            :to="item.index"
-            class="nav-item"
-            :class="{ active: activeMenu === item.index }"
-          >
-            <el-icon size="16">
-              <component :is="item.icon" />
+  <el-config-provider :locale="locale">
+    <div class="app-container">
+      <!-- 简洁顶部导航栏 -->
+      <header class="app-header">
+        <div class="nav-container">
+          <div class="brand">
+            <el-icon size="20" color="#2563eb">
+              <Setting />
             </el-icon>
-            <span>{{ item.label }}</span>
-          </router-link>
-        </nav>
+            <span>CertTool</span>
+          </div>
 
-        <div class="nav-actions">
-          <el-button
-            :icon="Star"
-            type="danger"
-            text
-            @click="$router.push('/donate')"
-            class="support-btn"
-          >
-            支持
-          </el-button>
+          <nav class="nav-menu">
+            <router-link
+              v-for="item in menuItems"
+              :key="item.index"
+              :to="item.index"
+              class="nav-item"
+              :class="{ active: activeMenu === item.index }"
+            >
+              <el-icon size="16">
+                <component :is="item.icon" />
+              </el-icon>
+              <span>{{ item.label }}</span>
+            </router-link>
+          </nav>
+
+          <div class="nav-actions">
+            <el-button
+              :icon="Star"
+              type="danger"
+              text
+              @click="$router.push('/donate')"
+              class="support-btn"
+            >
+              支持
+            </el-button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- 主内容区域 -->
-    <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
-        </transition>
-      </router-view>
-    </main>
-  </div>
+      <!-- 主内容区域 -->
+      <main class="main-content">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+          </transition>
+        </router-view>
+      </main>
+    </div>
+  </el-config-provider>
 </template>
 
 <style scoped>

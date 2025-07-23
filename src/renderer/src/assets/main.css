@@ -108,8 +108,6 @@ body {
 
 /* 全局按钮样式增强 */
 .el-button {
-  border-radius: var(--radius-md) !important;
-  font-weight: 500 !important;
   transition: all 0.2s ease !important;
 }
 
@@ -220,11 +218,6 @@ body {
   color: var(--text-primary) !important;
 }
 
-/* 抽屉样式增强 */
-.el-drawer {
-  border-radius: var(--radius-xl) 0 0 var(--radius-xl) !important;
-}
-
 .el-drawer__header {
   border-bottom: 1px solid var(--border-light) !important;
   padding: var(--spacing-lg) !important;
@@ -241,10 +234,6 @@ body {
 }
 
 /* 分页样式增强 */
-.el-pagination {
-  padding: var(--spacing-md) !important;
-}
-
 .el-pagination .btn-prev,
 .el-pagination .btn-next,
 .el-pager li {
