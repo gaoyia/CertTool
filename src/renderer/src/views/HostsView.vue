@@ -177,8 +177,15 @@ const saveHostsFileHandler = async () => {
 
 onMounted(async () => {
   if (editorContainer.value) {
+    let content
+    try {
+      content = await readHostsFile()
+    } catch (error) {
+      console.error('读取hosts文件失败:', error)
+      errorMessage.value = `读取hosts文件失败: ${error instanceof Error ? error.message : String(error)}`
+    }
     view = new EditorView({
-      doc: '',
+      doc: content,
       parent: editorContainer.value,
       extensions: [
         // A line number gutter
@@ -257,9 +264,6 @@ onMounted(async () => {
 
     // 初始调整一次高度
     adjustEditorHeight()
-
-    // 加载hosts文件
-    await loadHostsFile()
   }
 })
 
