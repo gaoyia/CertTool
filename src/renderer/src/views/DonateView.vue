@@ -85,12 +85,12 @@
 
           <div class="project-info">
             <p><strong>项目名称：</strong> CertTool</p>
-            <p><strong>版本：</strong> 1.0.0</p>
+            <p><strong>版本：</strong>{{ pkg.version }}</p>
             <p><strong>开发者：</strong> gaoyia@live.com</p>
             <p>
               <strong>链接：</strong>
               <br />
-              <a style="word-break: break-all" href="https://github.com/gaoyia/CertTool">
+              <a style="word-break: break-all" target="_blank" href="https://github.com/gaoyia/CertTool">
                 https://github.com/gaoyia/CertTool
               </a>
             </p>
@@ -111,6 +111,7 @@ import img2 from '@renderer/assets/2.png'
 import donate from '@renderer/assets/donate.jpg'
 import { ElMessage } from 'element-plus'
 import { Setting, InfoFilled, Loading } from '@element-plus/icons-vue'
+import pkg from '~/package.json'
 
 // 首页设置相关
 const selectedHomepage = ref('')

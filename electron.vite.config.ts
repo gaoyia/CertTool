@@ -19,6 +19,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
+        '~': resolve(''),
         '@dto': resolve('src/dto')
       }
     },
