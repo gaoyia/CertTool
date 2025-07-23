@@ -17,8 +17,8 @@
           <el-select
             v-model="location"
             style="width: 140px"
-            @change="fetchCertificates"
             class="location-select"
+            @change="fetchCertificates"
           >
             <el-option label="本地计算机" value="LocalMachine" />
             <el-option label="当前用户" value="CurrentUser" />
@@ -27,8 +27,8 @@
           <el-button
             type="primary"
             :loading="loading"
-            @click="fetchCertificates"
             class="refresh-btn"
+            @click="fetchCertificates"
           >
             <el-icon><Refresh /></el-icon>
             刷新列表
@@ -110,58 +110,52 @@
           <div class="card-title">
             <el-icon><Document /></el-icon>
             <span>受信任的根证书列表</span>
+            <span class="card-count">({{ filteredCertificates.length }})</span>
           </div>
-          <div class="card-subtitle">
-            共 {{ filteredCertificates.length }} 个证书
-          </div>
-        </div>
-      </template>
-
-      <!-- 搜索和筛选区域 -->
-      <div class="filter-section">
-        <el-row :gutter="16" align="middle">
-          <el-col :span="8">
+          <div class="header-filters">
             <el-input
               v-model="filterText"
-              placeholder="搜索证书名称、组织或指纹..."
+              placeholder="搜索证书..."
               clearable
               prefix-icon="Search"
-              class="search-input"
+              class="search-input compact"
+              style="width: 200px"
             />
-          </el-col>
-          <el-col :span="4">
             <el-select
               v-model="statusFilter"
-              placeholder="证书状态"
+              placeholder="状态"
               clearable
-              class="status-select"
+              class="status-select compact"
+              style="width: 100px"
             >
               <el-option label="全部" value="" />
               <el-option label="有效" value="valid" />
               <el-option label="即将过期" value="expiring" />
               <el-option label="已过期" value="expired" />
             </el-select>
-          </el-col>
-          <el-col :span="12" style="text-align: right">
             <el-button
               v-if="filterText || statusFilter"
               type="info"
               text
               @click="clearFilters"
+              class="clear-btn"
             >
-              清除筛选
+              清除
             </el-button>
-          </el-col>
-        </el-row>
-      </div>
+          </div>
+        </div>
+      </template>
 
       <!-- 证书表格 -->
       <div class="table-container">
+
+
         <el-table
           v-loading="loading"
           :data="pagedCertificates"
           style="width: 100%"
           stripe
+          height="calc(100vh - 500px)"
           class="certificate-table"
           :header-cell-style="{ background: '#f8fafc', color: '#1e293b', fontWeight: 600 }"
         >
@@ -179,10 +173,7 @@
                     {{ scope.row.parsedIssuer?.commonName || 'N/A' }}
                   </el-descriptions-item>
                   <el-descriptions-item label="有效期">
-                    <el-tag
-                      :type="getCertificateStatus(scope.row).type"
-                      size="small"
-                    >
+                    <el-tag :type="getCertificateStatus(scope.row).type" size="small">
                       {{ getCertificateStatus(scope.row).text }}
                     </el-tag>
                   </el-descriptions-item>
@@ -201,7 +192,9 @@
                   <span>{{ scope.row.parsedSubject?.commonName || '未知证书' }}</span>
                 </div>
                 <div class="cert-org">{{ scope.row.parsedSubject?.organization || 'N/A' }}</div>
-                <div class="cert-unit">{{ scope.row.parsedSubject?.organizationUnit || 'N/A' }}</div>
+                <div class="cert-unit">
+                  {{ scope.row.parsedSubject?.organizationUnit || 'N/A' }}
+                </div>
               </div>
             </template>
           </el-table-column>
@@ -245,9 +238,9 @@
             <template #default="scope">
               <el-button
                 type="danger"
+                class="delete-btn"
                 size="small"
                 @click="deleteCertificate(scope.row)"
-                class="delete-btn"
               >
                 <el-icon><Delete /></el-icon>
                 删除
@@ -257,10 +250,7 @@
         </el-table>
 
         <div v-if="!loading && pagedCertificates.length === 0" class="empty-container">
-          <el-empty
-            description="暂无证书数据"
-            image="/empty-certificate.svg"
-          >
+          <el-empty description="暂无证书数据">
             <template #description>
               <div class="empty-content">
                 <p>没有找到证书数据</p>
@@ -271,19 +261,20 @@
         </div>
       </div>
 
-      <!-- 分页 -->
-      <div v-if="certificates.length > 0" class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="filteredCertificates.length"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          class="pagination"
-        />
-      </div>
+      <template #footer>
+        <div v-if="certificates.length > 0" class="pagination-container">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            class="pagination"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="filteredCertificates.length"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+          />
+        </div>
+      </template>
     </el-card>
   </div>
 </template>
@@ -294,7 +285,7 @@ import { getTrustedRootCertificates, removeCertificateTrust } from '@renderer/ap
 import { CertificateInfo } from '@dto/certificate'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Refresh, StarFilled, Document, Check, Warning, CircleClose, Delete, Search } from '@element-plus/icons-vue'
+import { Refresh, Document, Check, Warning, CircleClose, Delete } from '@element-plus/icons-vue'
 
 // 证书列表数据
 const certificates = ref<CertificateInfo[]>([])
@@ -313,7 +304,7 @@ const pageSize = ref(20)
 // 计算证书状态
 const getCertificateStatus = (cert: CertificateInfo) => {
   const now = new Date()
-  const notBefore = new Date(cert.notBefore)
+  // const notBefore = new Date(cert.notBefore)
   const notAfter = new Date(cert.notAfter)
   const daysUntilExpiry = Math.ceil((notAfter.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
@@ -328,15 +319,15 @@ const getCertificateStatus = (cert: CertificateInfo) => {
 
 // 计算各类证书数量
 const validCertificates = computed(() => {
-  return certificates.value.filter(cert => getCertificateStatus(cert).text === '有效')
+  return certificates.value.filter((cert) => getCertificateStatus(cert).text === '有效')
 })
 
 const expiringCertificates = computed(() => {
-  return certificates.value.filter(cert => getCertificateStatus(cert).text === '即将过期')
+  return certificates.value.filter((cert) => getCertificateStatus(cert).text === '即将过期')
 })
 
 const expiredCertificates = computed(() => {
-  return certificates.value.filter(cert => getCertificateStatus(cert).text === '已过期')
+  return certificates.value.filter((cert) => getCertificateStatus(cert).text === '已过期')
 })
 
 // 筛选后的证书列表
@@ -357,13 +348,17 @@ const filteredCertificates = computed(() => {
 
   // 状态筛选
   if (statusFilter.value) {
-    filtered = filtered.filter(cert => {
+    filtered = filtered.filter((cert) => {
       const status = getCertificateStatus(cert).text
       switch (statusFilter.value) {
-        case 'valid': return status === '有效'
-        case 'expiring': return status === '即将过期'
-        case 'expired': return status === '已过期'
-        default: return true
+        case 'valid':
+          return status === '有效'
+        case 'expiring':
+          return status === '即将过期'
+        case 'expired':
+          return status === '已过期'
+        default:
+          return true
       }
     })
   }
@@ -567,6 +562,10 @@ onMounted(() => {
   flex-grow: 1;
   border-radius: 0.5rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-header {
@@ -584,56 +583,52 @@ onMounted(() => {
   color: #1e293b;
 }
 
-.card-subtitle {
-  font-size: 0.75rem;
+.card-count {
+  font-size: 0.875rem;
   color: #64748b;
+  font-weight: normal;
 }
 
-/* 紧凑筛选区域 */
+.header-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input.compact,
+.status-select.compact {
+  border-radius: 0.25rem;
+}
+
+.clear-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* 移除筛选区域样式 */
 .filter-section {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  display: none;
 }
 
-.search-input {
-  border-radius: 0.375rem;
-}
-
-.status-select {
-  border-radius: 0.375rem;
-}
-
-/* 紧凑表格样式 */
+/* 调整表格容器高度 */
 .table-container {
-  padding: 0.75rem 1rem;
   flex: 1;
-  overflow: auto;
-  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .certificate-table {
-  border-radius: 0.375rem;
-  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
-
-/* 紧凑表格高度 */
-:deep(.el-table__body-wrapper) {
-  overflow: auto;
-  max-height: calc(100vh - 320px);
-}
-
-:deep(.el-table) {
-  height: 100%;
-}
-
-:deep(.el-table th) {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-:deep(.el-table td) {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+:deep(.el-card__body) {
+  flex: 1;
+  padding: 0;
+  display: contents;
 }
 
 /* 紧凑内容样式 */
@@ -724,7 +719,6 @@ onMounted(() => {
 }
 
 .pagination-container {
-  padding: 0.75rem 1rem;
   display: flex;
   justify-content: flex-end;
 }

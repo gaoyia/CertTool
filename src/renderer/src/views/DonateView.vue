@@ -90,7 +90,11 @@
             <p>
               <strong>链接：</strong>
               <br />
-              <a style="word-break: break-all" target="_blank" href="https://github.com/gaoyia/CertTool">
+              <a
+                style="word-break: break-all"
+                target="_blank"
+                href="https://github.com/gaoyia/CertTool"
+              >
                 https://github.com/gaoyia/CertTool
               </a>
             </p>
