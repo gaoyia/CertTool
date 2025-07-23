@@ -1,6 +1,6 @@
 {
   "name": "cert-tool",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "One-stop self-processing book management and Hosts editing tool",
   "main": "./out/main/index.js",
   "author": "gaoyia@qq.com",
