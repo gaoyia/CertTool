@@ -95,14 +95,15 @@ const menuItems = [
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
+/* 紧凑顶部导航栏 */
 .app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
-  height: 64px;
+  padding: 0 1rem;
+  height: 48px;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid #e2e8f0;
 }
@@ -119,27 +120,28 @@ const menuItems = [
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 700;
-  font-size: 1.125rem;
+  gap: 0.375rem;
+  font-weight: 600;
+  font-size: 1rem;
   color: #1e293b;
 }
 
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
   color: #64748b;
   text-decoration: none;
   font-weight: 500;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
   position: relative;
 }
@@ -161,8 +163,8 @@ const menuItems = [
   bottom: -1px;
   left: 50%;
   transform: translateX(-50%);
-  width: 20px;
-  height: 2px;
+  width: 16px;
+  height: 1px;
   background: #2563eb;
   border-radius: 1px;
 }
@@ -174,6 +176,7 @@ const menuItems = [
 
 .support-btn {
   font-weight: 600;
+  font-size: 0.75rem;
   transition: all 0.2s ease;
 }
 
@@ -183,28 +186,28 @@ const menuItems = [
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   overflow-y: auto;
   background: var(--bg-secondary);
 }
 
-/* 响应式设计 */
+/* 紧凑响应式设计 */
 @media (max-width: 768px) {
   .app-header {
-    padding: 0 1rem;
+    padding: 0 0.75rem;
   }
 
   .nav-container {
-    padding: 0 0.5rem;
+    padding: 0 0.25rem;
   }
 
   .nav-menu {
-    gap: 0.25rem;
+    gap: 0.125rem;
   }
 
   .nav-item {
-    padding: 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.375rem;
+    font-size: 0.75rem;
   }
 
   .nav-item span {

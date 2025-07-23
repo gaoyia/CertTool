@@ -458,12 +458,21 @@ onMounted(() => {
   overflow: hidden;
 }
 
-/* 页面标题区域 */
+/* 紧凑页面布局 - 保持颜色和风格不变 */
+.cert-management {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+/* 紧凑标题区域 */
 .page-header {
   background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -475,208 +484,199 @@ onMounted(() => {
 .title-section {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .page-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 700;
+  gap: 0.375rem;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #1e293b;
   margin: 0;
 }
 
 .page-subtitle {
   color: #64748b;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   margin: 0;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   align-items: center;
 }
 
 .location-select {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
 .refresh-btn {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
-/* 统计卡片区域 */
+/* 紧凑统计卡片 */
 .stats-section {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .stat-card {
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .stat-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
+  gap: 0.75rem;
+  padding: 0.75rem;
 }
 
 .stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
   background: rgba(37, 99, 235, 0.1);
 }
 
 .stat-number {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #1e293b;
   line-height: 1;
 }
 
 .stat-label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
-  margin-top: 0.25rem;
+  margin-top: 0.125rem;
 }
 
-/* 主内容卡片 */
+/* 紧凑主内容卡片 */
 .certificate-card {
   flex-grow: 1;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
 }
 
 .card-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.125rem;
+  gap: 0.375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
 }
 
 .card-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
-/* 筛选区域 */
+/* 紧凑筛选区域 */
 .filter-section {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .search-input {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
 .status-select {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
-/* 表格样式 */
+/* 紧凑表格样式 */
 .table-container {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   flex: 1;
   overflow: auto;
   min-height: 0;
 }
 
 .certificate-table {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   overflow: hidden;
 }
 
-/* 确保表格可以滚动 */
+/* 紧凑表格高度 */
 :deep(.el-table__body-wrapper) {
   overflow: auto;
-  max-height: calc(100vh - 400px);
+  max-height: calc(100vh - 320px);
 }
 
 :deep(.el-table) {
   height: 100%;
 }
 
-/* 自定义滚动条样式 */
-.table-container::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+:deep(.el-table th) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
 }
 
-.table-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
+:deep(.el-table td) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
 }
 
-.table-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.table-container::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
+/* 紧凑内容样式 */
 .cert-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .cert-name {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
   font-weight: 600;
   color: #1e293b;
+  font-size: 0.875rem;
 }
 
 .cert-org {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
 .cert-unit {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   color: #94a3b8;
 }
 
 .validity-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .validity-item {
   display: flex;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+  gap: 0.375rem;
+  font-size: 0.75rem;
 }
 
 .validity-item .label {
   color: #64748b;
-  min-width: 2.5rem;
+  min-width: 2rem;
 }
 
 .validity-item .value {
@@ -686,29 +686,31 @@ onMounted(() => {
 .issuer-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.125rem;
 }
 
 .issuer-org {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
 }
 
 .certificate-details {
-  padding: 1rem;
+  padding: 0.75rem;
   background: #f8fafc;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
 .delete-btn {
-  border-radius: 0.375rem;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
 }
 
 .empty-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
+  padding: 2rem;
 }
 
 .empty-content {
@@ -716,38 +718,27 @@ onMounted(() => {
 }
 
 .empty-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #64748b;
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 .pagination-container {
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   display: flex;
   justify-content: flex-end;
 }
 
 .pagination {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
-/* 状态标签样式 */
-.status-valid {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #10b981;
-}
-
-.status-expiring {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
-}
-
+/* 紧凑状态标签 */
+.status-valid,
+.status-expiring,
 .status-expired {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
 }
 
 /* 响应式设计 */

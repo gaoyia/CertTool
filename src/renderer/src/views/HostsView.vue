@@ -293,14 +293,15 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* 紧凑Hosts编辑页面 */
 .hosts-view {
   height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
   background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -309,32 +310,18 @@ onUnmounted(() => {
   overflow: hidden;
   position: relative;
   border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  margin: 1.5rem;
+  border-radius: 0.375rem;
+  margin: 1rem;
 }
 
-/* 确保CodeMirror编辑器填满容器 */
+/* 紧凑编辑器样式 */
 .editor-container :deep(.cm-editor) {
   height: 100%;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
-/* 确保CodeMirror内容区域可以滚动 */
 .editor-container :deep(.cm-scroller) {
   overflow: auto;
-}
-
-/* CodeMirror主题样式 */
-.editor-container :deep(.cm-focused) {
-  outline: none;
-}
-
-.editor-container :deep(.cm-activeLine) {
-  background-color: rgba(37, 99, 235, 0.05);
-}
-
-.editor-container :deep(.cm-activeLineGutter) {
-  background-color: rgba(37, 99, 235, 0.05);
 }
 
 .editor-container :deep(.cm-gutters) {
@@ -344,54 +331,54 @@ onUnmounted(() => {
 }
 
 .editor-container :deep(.cm-lineNumbers) {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .editor-container :deep(.cm-content) {
   font-family: 'Consolas', 'Monaco', 'Lucida Console', monospace;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .hosts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .hosts-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: #1e293b;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .hosts-header h1::before {
   content: '';
   width: 3px;
-  height: 1.5rem;
+  height: 1.25rem;
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   border-radius: 2px;
 }
 
 .actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .save-button,
 .reload-button,
 .powershell-button {
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   transition: all 0.2s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -404,7 +391,7 @@ onUnmounted(() => {
 
 .save-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .save-button:disabled {
@@ -420,7 +407,7 @@ onUnmounted(() => {
 
 .reload-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
 }
 
 .reload-button:disabled {
@@ -436,7 +423,7 @@ onUnmounted(() => {
 
 .powershell-button:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
 }
 
 .powershell-button:disabled {
@@ -447,44 +434,44 @@ onUnmounted(() => {
 
 .error-message {
   color: #ef4444;
-  padding: 1rem;
+  padding: 0.75rem;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   position: absolute;
   box-sizing: border-box;
-  width: calc(100% - 3rem);
-  top: 1rem;
-  left: 1.5rem;
+  width: calc(100% - 2rem);
+  top: 0.75rem;
+  left: 1rem;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .success-message {
   color: #10b981;
-  padding: 1rem;
+  padding: 0.75rem;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   position: absolute;
   box-sizing: border-box;
-  width: calc(100% - 3rem);
-  top: 1rem;
-  left: 1.5rem;
+  width: calc(100% - 2rem);
+  top: 0.75rem;
+  left: 1rem;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 加载状态 */
+/* 紧凑加载状态 */
 :deep(.el-loading-mask) {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .hosts-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: stretch;
   }
 
@@ -493,13 +480,13 @@ onUnmounted(() => {
   }
 
   .editor-container {
-    margin: 1rem;
+    margin: 0.75rem;
   }
 
   .error-message,
   .success-message {
-    width: calc(100% - 2rem);
-    left: 1rem;
+    width: calc(100% - 1.5rem);
+    left: 0.75rem;
   }
 }
 </style>

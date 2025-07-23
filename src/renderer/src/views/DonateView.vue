@@ -134,153 +134,154 @@ const saveHomepageSetting = () => {
 </script>
 
 <style scoped>
+/* 紧凑捐赠页面 */
 .donate-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .page-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 600;
   background: linear-gradient(135deg, #ef4444, #dc2626);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: #64748b;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .donate-card,
 .settings-card,
 .info-card {
-  margin-bottom: 1.5rem;
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
   border: 1px solid #e2e8f0;
 }
 
 .donate-card:hover,
 .settings-card:hover,
 .info-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
 }
 
 .qrcode-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .donate-qrcode {
-  width: 280px;
-  height: 280px;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  width: 200px;
+  height: 200px;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
   border: 1px solid #e2e8f0;
 }
 
 .donate-qrcode:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .donate-message {
-  margin-top: 1.5rem;
-  font-size: 1.125rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
   color: #374151;
   text-align: center;
   font-weight: 500;
 }
 
 .story-section {
-  padding: 1.5rem;
+  padding: 1rem;
   color: #4b5563;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 .story-section p {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
 }
 
 .image-gallery {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
   flex-direction: column;
 }
 
 .gallery-image {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
   max-width: 100%;
   height: auto;
 }
 
 .gallery-image:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .setting-form {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .setting-label {
   font-weight: 600;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   color: #374151;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 .homepage-select {
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .setting-hint {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #6b7280;
-  margin-top: 0.5rem;
-  line-height: 1.5;
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }
 
 .project-info {
-  padding: 1.5rem;
+  padding: 1rem;
   color: #4b5563;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 .project-info p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
 }
 
 .project-info strong {
@@ -299,12 +300,12 @@ const saveHomepageSetting = () => {
 }
 
 .info-description {
-  margin-top: 1rem;
-  padding: 1rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
   background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border-left: 4px solid #2563eb;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  border-left: 3px solid #2563eb;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
   color: #374151;
 }
 
@@ -315,14 +316,14 @@ const saveHomepageSetting = () => {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
 }
 
-/* 动画效果 */
+/* 紧凑动画效果 */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -333,21 +334,21 @@ const saveHomepageSetting = () => {
 .donate-card,
 .settings-card,
 .info-card {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* 响应式调整 */
+/* 紧凑响应式调整 */
 @media (max-width: 768px) {
   .donate-container {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 
   .subtitle {
-    font-size: 1rem;
+    font-size: 0.875rem;
   }
 
   .el-row {
@@ -361,15 +362,15 @@ const saveHomepageSetting = () => {
   }
 
   .donate-qrcode {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
   }
 }
 
 @media (max-width: 480px) {
   .donate-qrcode {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
   }
 }
 </style>
